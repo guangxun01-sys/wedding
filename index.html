@@ -359,7 +359,7 @@
 </head>
 <body>
 
-    <!-- 音樂播映音源 (雙重高穩定 CDN 備援) -->
+    <!-- 音樂播映音源 (卡農鋼琴曲 / 雙重 CDN 備援) -->
     <audio id="bgm" loop crossorigin="anonymous" preload="auto">
         <source src="https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=pachelbel-canon-in-d-major-piano-112191.mp3" type="audio/mpeg">
         <source src="https://upload.wikimedia.org/wikipedia/commons/transcoded/0/07/Pachelbel%27s_Canon_in_D_Major.ogg/Pachelbel%27s_Canon_in_D_Major.ogg.mp3" type="audio/mpeg">
@@ -379,7 +379,7 @@
     <header>
         <p class="subtitle">WEDDING INVITATION</p>
         <h1>OSCAR & ANN</h1>
-        <p class="tagline">一起來相聚</p>
+        <p class="tagline">好久不見，我們婚禮見</p>
 
         <div class="countdown-container">
             <div class="time-box">
@@ -522,7 +522,6 @@
         const musicBtn = document.getElementById("musicBtn");
         const musicIcon = document.getElementById("musicIcon");
 
-        // 嘗試播放函數
         function tryPlay() {
             if (!isPlaying) {
                 var playPromise = audio.play();
@@ -532,13 +531,12 @@
                         musicBtn.classList.add("playing");
                         musicIcon.innerText = "🎵";
                     }).catch(error => {
-                        console.log("需要使用者互動後播放");
+                        console.log("Waiting for user interaction.");
                     });
                 }
             }
         }
 
-        // 手動開關音樂
         function toggleMusic(e) {
             if (e) e.stopPropagation();
             if (!isPlaying) {
@@ -547,7 +545,7 @@
                     musicBtn.classList.add("playing");
                     musicIcon.innerText = "🎵";
                 }).catch(err => {
-                    console.log("播放失敗：", err);
+                    console.log("Playback failed:", err);
                 });
             } else {
                 audio.pause();
@@ -557,14 +555,12 @@
             }
         }
 
-        // 解決手機/瀏覽器阻擋自動播放：只要使用者點擊、滑動或觸摸頁面任何地方即觸發播放
         ['click', 'touchstart', 'scroll', 'pointerdown'].forEach(evt => {
             document.addEventListener(evt, function handleAutoPlay() {
                 tryPlay();
             }, { once: true });
         });
 
-        // 倒數計時器
         const targetDate = new Date("Jan 9, 2027 12:00:00").getTime();
 
         function updateCountdown() {
@@ -586,7 +582,6 @@
         setInterval(updateCountdown, 1000);
         updateCountdown();
 
-        // 摺疊面板
         function toggleAccordion(element) {
             const content = element.nextElementSibling;
             const icon = element.querySelector('span:last-child');
@@ -599,7 +594,6 @@
             }
         }
 
-        // 表單提交後提示
         function showThankYou() {
             document.querySelector('.rsvp-form').style.display = 'none';
             document.getElementById('thank-you-msg').style.display = 'block';

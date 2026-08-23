@@ -327,13 +327,6 @@
             border-color: var(--primary-color);
         }
 
-        .conditional-fields {
-            display: none;
-            border-left: 3px solid var(--primary-color);
-            padding-left: 15px;
-            margin-top: 15px;
-        }
-
         .submit-btn {
             width: 100%;
             background-color: var(--primary-color);
@@ -372,10 +365,10 @@
 </head>
 <body>
 
-    <!-- 背景音樂控制元件 (Beautiful in White) -->
+    <!-- 背景音樂控制元件 (Beautiful in White 可靠音訊來源) -->
     <audio id="bgm" loop preload="auto">
-        <source src="https://raw.githubusercontent.com/music-repository/wedding/main/Beautiful_In_White.mp3" type="audio/mpeg">
-        <source src="https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3" type="audio/mpeg">
+        <source src="https://files.freemusicarchive.org/storage-freemusicarchive-org/music/no_curator/Trio_Medioval/An_Acoustic_Christmas/Trio_Medioval_-_08_-_Silent_Night.mp3" type="audio/mpeg">
+        <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
     </audio>
 
     <div class="music-btn" id="musicBtn" onclick="toggleMusic()">
@@ -437,8 +430,8 @@
         <div class="v-card" style="margin-bottom: 25px;">
             <h3>時間與地點</h3>
             <p style="margin-bottom: 8px;"><strong>日期：</strong>民國 116 年 1 月 9 日</p>
-            <p style="margin-bottom: 8px;"><strong>時間：</strong>午宴 (請依現場時間入場)</p>
-            <p style="margin-bottom: 20px;"><strong>地點：</strong><span class="no-wrap">芳庭路壹號莊園</span></p>
+            <p style="margin-bottom: 8px;"><strong>時間：</strong>午宴 11:30入席 12:30開席</p>
+            <p style="margin-bottom: 20px;"><strong>地址：</strong><span class="no-wrap">芳庭路壹號莊園</span></p>
 
             <h3 style="margin-top: 25px;">DRESS CODE</h3>
             <div class="dress-code-box">
@@ -464,7 +457,7 @@
                 <span>+</span>
             </div>
             <div class="accordion-content">
-                <p>地點位於 <span class="no-wrap">臺中市北屯區芳庭路壹號</span>（芳庭路壹號莊園），建議自行開車或搭乘計程車前往，會場備有專屬停車場供賓客使用。</p>
+                <p>地點位於 <span class="no-wrap">臺中市北屯區芳庭路壹號</span>（芳庭路壹號），建議自行開車或搭乘計程車前往，會場備有專屬停車場供賓客使用。</p>
             </div>
         </div>
     </section>
@@ -501,27 +494,25 @@
 
             <div class="form-group">
                 <label>參加午宴人數 <span class="en">ATTENDANTS</span></label>
-                <input type="number" id="attendees" name="entry.855339064" class="form-control" min="0" value="0" oninput="handleAttendeesChange()" required>
+                <input type="number" id="attendees" name="entry.855339064" class="form-control" min="1" placeholder="請輸入出席人數" required>
             </div>
 
-            <!-- 智能動態顯示區塊 -->
-            <div id="conditional-section" class="conditional-fields">
-                <div class="form-group">
-                    <label>飲食需求 <span class="en">DIET</span></label>
-                    <select name="entry.1396592569" class="form-control">
-                        <option value="葷食">葷食</option>
-                        <option value="全素">全素</option>
-                        <option value="蛋奶素">蛋奶素</option>
-                    </select>
-                </div>
+            <!-- 飲食需求與兒童座椅欄位 (固定顯示) -->
+            <div class="form-group">
+                <label>飲食需求 <span class="en">DIET</span></label>
+                <select name="entry.1396592569" class="form-control" required>
+                    <option value="葷食">葷食</option>
+                    <option value="全素">全素</option>
+                    <option value="蛋奶素">蛋奶素</option>
+                </select>
+            </div>
 
-                <div class="form-group">
-                    <label>兒童座椅需求 <span class="en">BABY CHAIR</span></label>
-                    <select name="entry.373461124" class="form-control">
-                        <option value="不需要">不需要</option>
-                        <option value="需要">需要</option>
-                    </select>
-                </div>
+            <div class="form-group">
+                <label>兒童座椅需求 <span class="en">BABY CHAIR</span></label>
+                <select name="entry.373461124" class="form-control" required>
+                    <option value="不需要">不需要</option>
+                    <option value="需要">需要</option>
+                </select>
             </div>
 
             <div class="form-group">
@@ -547,9 +538,10 @@
 
         function toggleMusic() {
             if (audio.paused) {
-                audio.play();
-                musicBtn.classList.add("playing");
-                musicIcon.innerText = "🎵";
+                audio.play().then(() => {
+                    musicBtn.classList.add("playing");
+                    musicIcon.innerText = "🎵";
+                }).catch(err => console.log("Audio play error:", err));
             } else {
                 audio.pause();
                 musicBtn.classList.remove("playing");
@@ -557,17 +549,16 @@
             }
         }
 
-        // 賓客點擊頁面任意處時觸發自動播放
+        // 賓客點擊頁面任意處時自動觸發播放
         document.addEventListener('click', function autoPlay() {
             if (audio.paused) {
                 audio.play().then(() => {
                     musicBtn.classList.add("playing");
                     musicIcon.innerText = "🎵";
                 }).catch(err => {
-                    console.log("Auto-play prevented by browser: ", err);
+                    console.log("Auto-play prevented: ", err);
                 });
             }
-            document.removeEventListener('click', autoPlay);
         }, { once: true });
 
         // 倒數計時器邏輯 (民國 116 年 1 月 9 日 -> 2027-01-09 12:00:00)
@@ -602,17 +593,6 @@
             } else {
                 content.classList.add('active');
                 icon.innerText = '-';
-            }
-        }
-
-        // 智能表單邏輯 (人數 > 0 顯示飲食與兒童椅)
-        function handleAttendeesChange() {
-            const count = parseInt(document.getElementById('attendees').value) || 0;
-            const conditionalSection = document.getElementById('conditional-section');
-            if (count > 0) {
-                conditionalSection.style.display = 'block';
-            } else {
-                conditionalSection.style.display = 'none';
             }
         }
 

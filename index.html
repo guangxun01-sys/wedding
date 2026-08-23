@@ -36,7 +36,7 @@
             white-space: nowrap;
         }
 
-        /* ====== Entrance Overlay ====== */
+        /* ====== Entrance Overlay (NEW) ====== */
         #entranceOverlay {
             position: fixed;
             inset: 0;
@@ -88,6 +88,7 @@
             0%, 100% { box-shadow: 0 0 0 0 rgba(255,255,255,0.35); }
             50% { box-shadow: 0 0 0 12px rgba(255,255,255,0); }
         }
+        /* ====== End Entrance Overlay ====== */
 
         /* Fixed Frosted Glass Nav */
         nav {
@@ -413,7 +414,10 @@
 </head>
 <body>
 
-    <!-- Entrance Overlay -->
+    <!-- ====== Entrance Overlay (NEW) ======
+         客人一開啟連結會先看到這個畫面，點擊/觸控後才會播放音樂並進入邀請函。
+         這是唯一能保證電腦和手機都「一定」聽得到音樂的方式，
+         因為瀏覽器規定「有聲音」的播放一定要先有使用者的點擊或觸控動作。 -->
     <div id="entranceOverlay" onclick="enterInvitation()">
         <h2 class="en-font">OSCAR & ANN</h2>
         <p>點擊進入我們的婚禮邀請函<br class="mobile-break">Tap to enter our wedding invitation</p>
@@ -423,10 +427,9 @@
     <!-- Hidden Iframe for Form Submission -->
     <iframe name="hidden_iframe" id="hidden_iframe" style="display:none;" onload="if(submitted){alert('出席回函已順利送出，期待您的到來！');}"></iframe>
 
-    <!-- Background Music (High-compatibility CDN Romantic Piano Audio Source) -->
+    <!-- Background Music (Canon in D - Piano, Gregor Quendel, CC BY-NC 4.0) -->
     <audio id="bgm" loop playsinline preload="auto">
-        <source src="https://actions.google.com/sounds/v1/ambiences/outdoor_romantic_theme.ogg" type="audio/ogg">
-        <source src="https://cdn.jsdelivr.net/gh/anars/blank-audio@master/10-seconds-of-silence.mp3" type="audio/mpeg">
+        <source src="canon-in-d-piano.mp3" type="audio/mpeg">
     </audio>
 
     <button class="audio-btn" id="audioToggle" onclick="toggleAudio()" title="播放/暫停音樂">🎵</button>
@@ -485,7 +488,7 @@
                 </div>
                 <div class="v-card-item">
                     <div class="v-card-label">婚禮日期</div>
-                    <div class="v-card-value"><span class="no-wrap">民國 116 年 1 月 9 日</span> (星期六)</div>
+                    <div class="v-card-value"><span class="no-wrap">民國 116 年 1 月 9 日</span> (星期五)</div>
                 </div>
                 <div class="v-card-item">
                     <div class="v-card-label">流程時間</div>
@@ -602,26 +605,20 @@
         var submitted = false;
         const audio = document.getElementById('bgm');
         const overlay = document.getElementById('entranceOverlay');
-        let isPlaying = false;
 
-        function playMusic() {
-            if (!isPlaying) {
-                audio.play().then(() => {
-                    isPlaying = true;
-                }).catch(e => {
-                    console.log('Autoplay blocked:', e);
-                });
-            }
-        }
-
+        // ====== 進場動作：點擊/觸控遮罩層時觸發 ======
+        // 這個函式是在真正的使用者點擊事件裡呼叫的，
+        // 所以瀏覽器一定會允許播放「有聲音」的音樂（電腦與手機皆適用）。
         function enterInvitation() {
-            playMusic();
+            audio.muted = false;
+            audio.currentTime = 0;
+            audio.play().catch(function(e) {
+                console.log('音樂播放失敗，可能是網路問題：', e);
+            });
             overlay.classList.add('hidden');
         }
 
-        document.addEventListener('click', playMusic, { once: true });
-        document.addEventListener('touchstart', playMusic, { once: true });
-
+        // 遮罩層本身也支援鍵盤 Enter / 空白鍵觸發（無障礙）
         overlay.setAttribute('tabindex', '0');
         overlay.addEventListener('keydown', function(e) {
             if (e.key === 'Enter' || e.key === ' ') {
@@ -630,15 +627,15 @@
         });
 
         function toggleAudio() {
-            if (audio.paused) {
-                audio.play();
-                isPlaying = true;
+            if (audio.paused || audio.muted) {
+                audio.muted = false;
+                audio.play().catch(e => console.log(e));
             } else {
                 audio.pause();
-                isPlaying = false;
             }
         }
 
+        // Countdown Timer Logic Target: 116/1/9 11:30 AM (2027-01-09 11:30:00)
         const targetDate = new Date('2027-01-09T11:30:00').getTime();
 
         function updateCountdown() {
@@ -663,11 +660,13 @@
         setInterval(updateCountdown, 1000);
         updateCountdown();
 
+        // Accordion Toggle Logic
         function toggleAccordion(button) {
             const content = button.nextElementSibling;
             content.classList.toggle('active');
         }
 
+        // Smart Form Logic
         function handleAttendeeChange(val) {
             const count = parseInt(val, 10);
             const dietField = document.getElementById('dietField');

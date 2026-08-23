@@ -7,6 +7,12 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Noto+Serif+TC:wght@300;400;600&display=swap" rel="stylesheet">
+    
+    <script>
+        // Ensure global accessibility for iframe onload callback
+        window.submitted = false;
+    </script>
+
     <style>
         :root {
             --primary-color: #d4a373;
@@ -34,6 +40,61 @@
         .no-wrap {
             white-space: nowrap;
             display: inline-block;
+        }
+
+        /* 手機解鎖音樂互動遮罩 (完美解決手機自動播放限制) */
+        #welcome-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(40, 35, 30, 0.88);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: #fff;
+            text-align: center;
+            padding: 20px;
+            transition: opacity 0.6s ease;
+        }
+
+        #welcome-overlay h2 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+            letter-spacing: 2px;
+            color: #f4e8d8;
+        }
+
+        #welcome-overlay p {
+            font-size: 1rem;
+            margin-bottom: 30px;
+            letter-spacing: 1px;
+            opacity: 0.9;
+        }
+
+        .enter-btn {
+            background-color: var(--primary-color);
+            color: #fff;
+            border: none;
+            padding: 14px 40px;
+            font-size: 1.05rem;
+            border-radius: 30px;
+            cursor: pointer;
+            font-family: 'Noto Serif TC', serif;
+            letter-spacing: 2px;
+            box-shadow: 0 6px 20px rgba(212, 163, 115, 0.4);
+            transition: transform 0.2s, background-color 0.3s;
+        }
+
+        .enter-btn:hover {
+            background-color: #c29263;
+            transform: scale(1.05);
         }
 
         /* 音樂懸浮按鈕 */
@@ -103,7 +164,7 @@
         /* 全螢幕封面 */
         header {
             height: 100vh;
-            background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('https://i.postimg.cc/GhP5tbF9/S-108036099.jpg') center/cover no-repeat;
+            background: linear-gradient(rgba(0,0,0,0.35), rgba(0,0,0,0.35)), url('https://i.postimg.cc/GhP5tbF9/S-108036099.jpg') center/cover no-repeat;
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -360,9 +421,15 @@
 </head>
 <body>
 
-    <!-- 溫馨浪漫背景音樂 (無版權穩定音源) -->
+    <div id="welcome-overlay">
+        <h2>OSCAR & ANN</h2>
+        <p>誠摯邀請您一起來相聚</p>
+        <button class="enter-btn" onclick="openInvitation()">開啟婚禮邀請函 🎵</button>
+    </div>
+
+    <!-- 日式溫馨浪漫鋼琴曲 (高穩定度無版權直連音源) -->
     <audio id="bgm" loop preload="auto">
-        <source src="https://assets.mixkit.co/music/download/mixkit-romantic-piano-1603.mp3" type="audio/mpeg">
+        <source src="https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf756.mp3?filename=gentle-romantic-piano-110463.mp3" type="audio/mpeg">
     </audio>
 
     <div class="music-btn" id="musicBtn" onclick="toggleMusic()">
@@ -424,7 +491,7 @@
         <div class="v-card" style="margin-bottom: 25px;">
             <h3>時間與地點</h3>
             <p style="margin-bottom: 8px;"><strong>日期：</strong>民國 116 年 1 月 9 日</p>
-            <p style="margin-bottom: 8px;"><strong>時間：</strong>11:30入席;12:30開席</p>
+            <p style="margin-bottom: 8px;"><strong>時間：</strong>11:30 入席；12:30 開席</p>
             <p style="margin-bottom: 20px;"><strong>地點：</strong><span class="no-wrap">芳庭路壹號莊園</span></p>
 
             <h3 style="margin-top: 25px;">DRESS CODE</h3>
@@ -459,9 +526,9 @@
         <h2 class="section-title">RSVP</h2>
         <p class="section-subtitle">出席回函</p>
 
-        <iframe name="hidden_iframe" id="hidden_iframe" style="display:none;" onload="if(submitted) {showThankYou();}"></iframe>
+        <iframe name="hidden_iframe" id="hidden_iframe" style="display:none;" onload="if(window.submitted) {showThankYou();}"></iframe>
 
-        <form class="rsvp-form" action="https://docs.google.com/forms/d/e/1FAIpQLSfJVYvJE2t3JWjzprufLrtnPokcRj51VEIrsZyhGVab3kDYbw/formResponse" method="POST" target="hidden_iframe" onsubmit="submitted=true;">
+        <form class="rsvp-form" action="https://docs.google.com/forms/d/e/1FAIpQLSfJVYvJE2t3JWjzprufLrtnPokcRj51VEIrsZyhGVab3kDYbw/formResponse" method="POST" target="hidden_iframe" onsubmit="window.submitted=true;">
             
             <div class="form-group">
                 <label>姓名 <span class="en">NAME</span></label>
@@ -522,13 +589,27 @@
     </section>
 
     <script>
-        var submitted = false;
-
-        // 音樂播映雙重保障機制
         let isPlaying = false;
         const audio = document.getElementById("bgm");
         const musicBtn = document.getElementById("musicBtn");
         const musicIcon = document.getElementById("musicIcon");
+        const welcomeOverlay = document.getElementById("welcome-overlay");
+
+        // 手機解鎖音樂互動按鈕 (完美繞過瀏覽器自動播放限制)
+        function openInvitation() {
+            audio.play().then(() => {
+                isPlaying = true;
+                musicBtn.classList.add("playing");
+                musicIcon.innerText = "🎵";
+            }).catch((err) => {
+                console.log("Audio play blocked or error:", err);
+            });
+
+            welcomeOverlay.style.opacity = '0';
+            setTimeout(() => {
+                welcomeOverlay.style.display = 'none';
+            }, 600);
+        }
 
         function toggleMusic() {
             if (!isPlaying) {
@@ -547,14 +628,7 @@
             }
         }
 
-        // 頁面任意點擊觸發播放
-        document.addEventListener('click', function startAudioOnInteraction() {
-            if (!isPlaying) {
-                toggleMusic();
-            }
-        }, { once: true });
-
-        // 倒數計時器
+        // 倒數計時器 (116年1月9日 12:00:00，即 2027年1月9日 12:00:00)
         const targetDate = new Date("Jan 9, 2027 12:00:00").getTime();
 
         function updateCountdown() {

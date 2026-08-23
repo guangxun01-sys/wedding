@@ -412,9 +412,9 @@
     <!-- Hidden Iframe for Form Submission -->
     <iframe name="hidden_iframe" id="hidden_iframe" style="display:none;" onload="if(submitted){alert('出席回函已順利送出，期待您的到來！');}"></iframe>
 
-    <!-- Background Music -->
-    <audio id="bgm" loop preload="auto">
-        <source src="https://upload.wikimedia.org/wikipedia/commons/2/22/Pachelbel_Canon_in_D_Major_orchestral.ogg" type="audio/ogg">
+    <!-- Background Music (Canon in D) -->
+    <audio id="bgm" loop playsinline muted autoplay>
+        <source src="https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=pachelbel-canon-in-d-major-113747.mp3" type="audio/mpeg">
     </audio>
 
     <button class="audio-btn" id="audioToggle" onclick="toggleAudio()" title="播放/暫停音樂">🎵</button>
@@ -589,19 +589,31 @@
     <script>
         var submitted = false;
 
-        // Auto play audio setup
+        // Auto play audio logic with Browser Autoplay Policy Compliance
         const audio = document.getElementById('bgm');
-        function playAudio() {
-            audio.play().catch(function(error) {
-                document.addEventListener('click', function() {
-                    audio.play();
-                }, { once: true });
-            });
+
+        function enableSound() {
+            if (audio.muted) {
+                audio.muted = false;
+            }
+            audio.play().catch(e => console.log(e));
+            // Remove event listeners after initial interaction
+            document.removeEventListener('click', enableSound);
+            document.removeEventListener('touchstart', enableSound);
+            document.removeEventListener('scroll', enableSound);
         }
-        window.addEventListener('load', playAudio);
+
+        // Start playback on page load (muted) and register interaction listeners
+        window.addEventListener('load', function() {
+            audio.play().catch(e => console.log(e));
+            document.addEventListener('click', enableSound, { once: true });
+            document.addEventListener('touchstart', enableSound, { once: true });
+            document.addEventListener('scroll', enableSound, { once: true });
+        });
 
         function toggleAudio() {
-            if (audio.paused) {
+            if (audio.paused || audio.muted) {
+                audio.muted = false;
                 audio.play();
             } else {
                 audio.pause();

@@ -37,6 +37,39 @@
             display: inline-block;
         }
 
+        /* 音樂懸浮按鈕 */
+        .music-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 25px;
+            width: 48px;
+            height: 48px;
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid var(--primary-color);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            z-index: 2000;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+            backdrop-filter: blur(5px);
+            transition: all 0.3s ease;
+        }
+
+        .music-btn.playing {
+            animation: spin 4s linear infinite;
+        }
+
+        .music-icon {
+            font-size: 1.2rem;
+            color: var(--primary-color);
+        }
+
+        @keyframes spin {
+            100% { transform: rotate(360deg); }
+        }
+
         /* 1. 頂端毛玻璃導航列 */
         nav {
             position: fixed;
@@ -196,6 +229,23 @@
             border: 1px solid rgba(0,0,0,0.08);
         }
 
+        /* 地圖容器 */
+        .map-container {
+            width: 100%;
+            height: 320px;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 25px;
+            border: 1px solid rgba(212, 163, 115, 0.2);
+        }
+
+        .map-container iframe {
+            width: 100%;
+            height: 100%;
+            border: 0;
+        }
+
         /* 5. 摺疊式交通指引 (Accordion) */
         .accordion-item {
             background: #ffffff;
@@ -316,10 +366,21 @@
             .time-box .num { font-size: 1.6rem; }
             section { padding: 50px 15px; }
             .v-card, .rsvp-form { padding: 25px 20px; }
+            .map-container { height: 260px; }
         }
     </style>
 </head>
 <body>
+
+    <!-- 背景音樂控制元件 (Beautiful in White) -->
+    <audio id="bgm" loop preload="auto">
+        <source src="https://raw.githubusercontent.com/music-repository/wedding/main/Beautiful_In_White.mp3" type="audio/mpeg">
+        <source src="https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3" type="audio/mpeg">
+    </audio>
+
+    <div class="music-btn" id="musicBtn" onclick="toggleMusic()">
+        <span class="music-icon" id="musicIcon">🎵</span>
+    </div>
 
     <!-- 毛玻璃導航列 -->
     <nav>
@@ -373,11 +434,11 @@
         <h2 class="section-title">Wedding Details</h2>
         <p class="section-subtitle">婚禮詳情與交通指引</p>
         
-        <div class="v-card" style="margin-bottom: 30px;">
+        <div class="v-card" style="margin-bottom: 25px;">
             <h3>時間與地點</h3>
             <p style="margin-bottom: 8px;"><strong>日期：</strong>民國 116 年 1 月 9 日</p>
             <p style="margin-bottom: 8px;"><strong>時間：</strong>午宴 (請依現場時間入場)</p>
-            <p style="margin-bottom: 20px;"><strong>地址：</strong><span class="no-wrap">臺中市北屯區芳庭路壹號</span></p>
+            <p style="margin-bottom: 20px;"><strong>地點：</strong><span class="no-wrap">芳庭路壹號莊園</span></p>
 
             <h3 style="margin-top: 25px;">DRESS CODE</h3>
             <div class="dress-code-box">
@@ -387,6 +448,15 @@
             </div>
         </div>
 
+        <!-- Google 地圖嵌入區塊 -->
+        <div class="map-container">
+            <iframe 
+                src="https://maps.google.com/maps?q=臺中市北屯區芳庭路壹號&t=&z=15&ie=UTF8&iwloc=&output=embed" 
+                allowfullscreen="" 
+                loading="lazy">
+            </iframe>
+        </div>
+
         <!-- 交通指引 Accordion -->
         <div class="accordion-item">
             <div class="accordion-header" onclick="toggleAccordion(this)">
@@ -394,7 +464,7 @@
                 <span>+</span>
             </div>
             <div class="accordion-content">
-                <p>地點位於 <span class="no-wrap">臺中市北屯區芳庭路壹號</span>，建議自行開車或搭乘計程車前往，會場備有專屬停車空間。</p>
+                <p>地點位於 <span class="no-wrap">臺中市北屯區芳庭路壹號</span>（芳庭路壹號莊園），建議自行開車或搭乘計程車前往，會場備有專屬停車場供賓客使用。</p>
             </div>
         </div>
     </section>
@@ -469,6 +539,36 @@
 
     <script>
         var submitted = false;
+
+        // 音樂控制邏輯
+        const audio = document.getElementById("bgm");
+        const musicBtn = document.getElementById("musicBtn");
+        const musicIcon = document.getElementById("musicIcon");
+
+        function toggleMusic() {
+            if (audio.paused) {
+                audio.play();
+                musicBtn.classList.add("playing");
+                musicIcon.innerText = "🎵";
+            } else {
+                audio.pause();
+                musicBtn.classList.remove("playing");
+                musicIcon.innerText = "🔇";
+            }
+        }
+
+        // 賓客點擊頁面任意處時觸發自動播放
+        document.addEventListener('click', function autoPlay() {
+            if (audio.paused) {
+                audio.play().then(() => {
+                    musicBtn.classList.add("playing");
+                    musicIcon.innerText = "🎵";
+                }).catch(err => {
+                    console.log("Auto-play prevented by browser: ", err);
+                });
+            }
+            document.removeEventListener('click', autoPlay);
+        }, { once: true });
 
         // 倒數計時器邏輯 (民國 116 年 1 月 9 日 -> 2027-01-09 12:00:00)
         const targetDate = new Date("Jan 9, 2027 12:00:00").getTime();

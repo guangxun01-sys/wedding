@@ -360,9 +360,9 @@
 </head>
 <body>
 
-    <!-- 音樂元件與線上備用音源 -->
+    <!-- 溫馨浪漫背景音樂 (無版權穩定音源) -->
     <audio id="bgm" loop preload="auto">
-        <source src="https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3" type="audio/mpeg">
+        <source src="https://assets.mixkit.co/music/download/mixkit-romantic-piano-1603.mp3" type="audio/mpeg">
     </audio>
 
     <div class="music-btn" id="musicBtn" onclick="toggleMusic()">
@@ -425,7 +425,7 @@
             <h3>時間與地點</h3>
             <p style="margin-bottom: 8px;"><strong>日期：</strong>民國 116 年 1 月 9 日</p>
             <p style="margin-bottom: 8px;"><strong>時間：</strong>11:30入席;12:30開席</p>
-            <p style="margin-bottom: 20px;"><strong>地址：</strong><span class="no-wrap">芳庭路壹號莊園</span></p>
+            <p style="margin-bottom: 20px;"><strong>地點：</strong><span class="no-wrap">芳庭路壹號莊園</span></p>
 
             <h3 style="margin-top: 25px;">DRESS CODE</h3>
             <div class="dress-code-box">
@@ -497,11 +497,11 @@
                 </select>
             </div>
 
-            <!-- 兒童座椅選單（修正為張數選項） -->
+            <!-- 兒童座椅選單 -->
             <div class="form-group">
                 <label>兒童座椅需求 <span class="en">BABY CHAIR</span></label>
                 <select name="entry.373461124" class="form-control" required>
-                    <option value="0張">不需要 (0張)</option>
+                    <option value="0張">0 張</option>
                     <option value="1張">1 張</option>
                     <option value="2張">2 張</option>
                     <option value="3張">3 張</option>
@@ -524,29 +524,11 @@
     <script>
         var submitted = false;
 
-        // 音樂播映雙重保障機制 (Web Audio API 柔和琴音與 MP3 備援)
+        // 音樂播映雙重保障機制
         let isPlaying = false;
         const audio = document.getElementById("bgm");
         const musicBtn = document.getElementById("musicBtn");
         const musicIcon = document.getElementById("musicIcon");
-
-        let audioCtx;
-        function playChime() {
-            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            const notes = [261.63, 329.63, 392.00, 523.25];
-            notes.forEach((freq, idx) => {
-                let osc = audioCtx.createOscillator();
-                let gain = audioCtx.createGain();
-                osc.type = 'sine';
-                osc.frequency.value = freq;
-                gain.gain.setValueAtTime(0.05, audioCtx.currentTime + idx * 0.3);
-                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + idx * 0.3 + 1.2);
-                osc.connect(gain);
-                gain.connect(audioCtx.destination);
-                osc.start(audioCtx.currentTime + idx * 0.3);
-                osc.stop(audioCtx.currentTime + idx * 0.3 + 1.2);
-            });
-        }
 
         function toggleMusic() {
             if (!isPlaying) {
@@ -555,10 +537,7 @@
                     musicBtn.classList.add("playing");
                     musicIcon.innerText = "🎵";
                 }).catch(() => {
-                    playChime();
-                    isPlaying = true;
-                    musicBtn.classList.add("playing");
-                    musicIcon.innerText = "🎵";
+                    console.log("Audio play error");
                 });
             } else {
                 audio.pause();

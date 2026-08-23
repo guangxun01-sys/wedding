@@ -36,39 +36,15 @@
             display: inline-block;
         }
 
-        /* 音樂播放提示條 */
-        .music-toast {
-            position: fixed;
-            bottom: 90px;
-            right: 25px;
-            background: rgba(51, 51, 51, 0.85);
-            color: #ffffff;
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            z-index: 2000;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
-            backdrop-filter: blur(5px);
-            animation: fadeInOut 4s forwards;
-            pointer-events: none;
-        }
-
-        @keyframes fadeInOut {
-            0% { opacity: 0; transform: translateY(10px); }
-            15% { opacity: 1; transform: translateY(0); }
-            85% { opacity: 1; transform: translateY(0); }
-            100% { opacity: 0; transform: translateY(10px); }
-        }
-
         /* 音樂懸浮按鈕 */
         .music-btn {
             position: fixed;
             bottom: 30px;
             right: 25px;
-            width: 50px;
-            height: 50px;
+            width: 55px;
+            height: 55px;
             background: rgba(255, 255, 255, 0.95);
-            border: 1px solid var(--primary-color);
+            border: 2px solid var(--primary-color);
             border-radius: 50%;
             display: flex;
             justify-content: center;
@@ -85,7 +61,7 @@
         }
 
         .music-icon {
-            font-size: 1.2rem;
+            font-size: 1.3rem;
             color: var(--primary-color);
         }
 
@@ -304,7 +280,6 @@
             max-height: 300px;
         }
 
-        /* 雙語表單 */
         .rsvp-form {
             background: #ffffff;
             padding: 40px;
@@ -384,34 +359,28 @@
 </head>
 <body>
 
-    <!-- 英式浪漫風格音源（雙備援格式） -->
-    <audio id="bgm" loop preload="auto">
-        <source src="https://upload.wikimedia.org/wikipedia/commons/0/07/Pachelbel%27s_Canon_in_D_Major.ogg" type="audio/ogg">
-        <source src="https://ia800301.us.archive.org/28/items/PachelbelCanonInDMajor_201603/PachelbelCanonInDMajor.mp3" type="audio/mpeg">
+    <!-- 音樂播映音源 (雙重高穩定 CDN 備援) -->
+    <audio id="bgm" loop crossorigin="anonymous" preload="auto">
+        <source src="https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=pachelbel-canon-in-d-major-piano-112191.mp3" type="audio/mpeg">
+        <source src="https://upload.wikimedia.org/wikipedia/commons/transcoded/0/07/Pachelbel%27s_Canon_in_D_Major.ogg/Pachelbel%27s_Canon_in_D_Major.ogg.mp3" type="audio/mpeg">
     </audio>
 
-    <!-- 點擊提示 -->
-    <div class="music-toast" id="musicToast">✨ 點擊畫面任意處開啟音樂</div>
-
-    <!-- 音樂控制按鈕 -->
+    <!-- 音樂控制懸浮按鈕 -->
     <div class="music-btn" id="musicBtn" onclick="toggleMusic(event)">
         <span class="music-icon" id="musicIcon">🎵</span>
     </div>
 
-    <!-- 毛玻璃導航列 -->
     <nav>
         <a href="#about">關於我們</a>
         <a href="#details">婚禮詳情</a>
         <a href="#rsvp">出席回函</a>
     </nav>
 
-    <!-- 全螢幕封面 -->
     <header>
         <p class="subtitle">WEDDING INVITATION</p>
         <h1>OSCAR & ANN</h1>
         <p class="tagline">一起來相聚</p>
 
-        <!-- 倒數計時器 -->
         <div class="countdown-container">
             <div class="time-box">
                 <span class="num" id="days">00</span>
@@ -435,7 +404,6 @@
         </div>
     </header>
 
-    <!-- 關於我們 -->
     <section id="about">
         <h2 class="section-title">About Us</h2>
         <p class="section-subtitle">關於我們</p>
@@ -445,7 +413,6 @@
         </div>
     </section>
 
-    <!-- 婚禮詳情 -->
     <section id="details">
         <h2 class="section-title">Wedding Details</h2>
         <p class="section-subtitle">婚禮詳情與交通指引</p>
@@ -483,7 +450,6 @@
         </div>
     </section>
 
-    <!-- 出席回函 -->
     <section id="rsvp">
         <h2 class="section-title">RSVP</h2>
         <p class="section-subtitle">出席回函</p>
@@ -526,7 +492,6 @@
                 </select>
             </div>
 
-            <!-- 兒童座椅選單 -->
             <div class="form-group">
                 <label>兒童座椅需求 <span class="en">BABY CHAIR</span></label>
                 <select name="entry.373461124" class="form-control" required>
@@ -552,24 +517,28 @@
 
     <script>
         var submitted = false;
-
         let isPlaying = false;
         const audio = document.getElementById("bgm");
         const musicBtn = document.getElementById("musicBtn");
         const musicIcon = document.getElementById("musicIcon");
 
-        function playMusic() {
+        // 嘗試播放函數
+        function tryPlay() {
             if (!isPlaying) {
-                audio.play().then(() => {
-                    isPlaying = true;
-                    musicBtn.classList.add("playing");
-                    musicIcon.innerText = "🎵";
-                }).catch((err) => {
-                    console.log("Autoplay blocked or error:", err);
-                });
+                var playPromise = audio.play();
+                if (playPromise !== undefined) {
+                    playPromise.then(() => {
+                        isPlaying = true;
+                        musicBtn.classList.add("playing");
+                        musicIcon.innerText = "🎵";
+                    }).catch(error => {
+                        console.log("需要使用者互動後播放");
+                    });
+                }
             }
         }
 
+        // 手動開關音樂
         function toggleMusic(e) {
             if (e) e.stopPropagation();
             if (!isPlaying) {
@@ -577,8 +546,8 @@
                     isPlaying = true;
                     musicBtn.classList.add("playing");
                     musicIcon.innerText = "🎵";
-                }).catch((err) => {
-                    console.log("Play error:", err);
+                }).catch(err => {
+                    console.log("播放失敗：", err);
                 });
             } else {
                 audio.pause();
@@ -588,12 +557,10 @@
             }
         }
 
-        // 監聽點擊/觸控事件以解鎖瀏覽器自動播放限制
-        ['click', 'touchstart'].forEach(eventType => {
-            document.addEventListener(eventType, function startAudioOnInteraction() {
-                if (!isPlaying) {
-                    playMusic();
-                }
+        // 解決手機/瀏覽器阻擋自動播放：只要使用者點擊、滑動或觸摸頁面任何地方即觸發播放
+        ['click', 'touchstart', 'scroll', 'pointerdown'].forEach(evt => {
+            document.addEventListener(evt, function handleAutoPlay() {
+                tryPlay();
             }, { once: true });
         });
 
@@ -619,7 +586,7 @@
         setInterval(updateCountdown, 1000);
         updateCountdown();
 
-        // 摺疊面板 Accordion
+        // 摺疊面板
         function toggleAccordion(element) {
             const content = element.nextElementSibling;
             const icon = element.querySelector('span:last-child');
@@ -632,7 +599,7 @@
             }
         }
 
-        // 表單提交後提示訊息
+        // 表單提交後提示
         function showThankYou() {
             document.querySelector('.rsvp-form').style.display = 'none';
             document.getElementById('thank-you-msg').style.display = 'block';

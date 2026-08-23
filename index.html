@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OSCAR & ANN | 婚禮邀請函</title>
+    <title>歐洸熏 OSCAR & 曾照恩 ANN | 婚禮邀請函</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Noto+Serif+TC:wght@300;400;600&display=swap" rel="stylesheet">
@@ -34,6 +34,30 @@
         .no-wrap {
             white-space: nowrap;
             display: inline-block;
+        }
+
+        /* 音樂播放提示條 */
+        .music-toast {
+            position: fixed;
+            bottom: 90px;
+            right: 25px;
+            background: rgba(51, 51, 51, 0.85);
+            color: #ffffff;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            z-index: 2000;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+            backdrop-filter: blur(5px);
+            animation: fadeInOut 4s forwards;
+            pointer-events: none;
+        }
+
+        @keyframes fadeInOut {
+            0% { opacity: 0; transform: translateY(10px); }
+            15% { opacity: 1; transform: translateY(0); }
+            85% { opacity: 1; transform: translateY(0); }
+            100% { opacity: 0; transform: translateY(10px); }
         }
 
         /* 音樂懸浮按鈕 */
@@ -360,12 +384,17 @@
 </head>
 <body>
 
-    <!-- 溫馨浪漫背景音樂 (無版權穩定音源) -->
+    <!-- 英式浪漫風格音源（雙備援格式） -->
     <audio id="bgm" loop preload="auto">
-        <source src="https://assets.mixkit.co/music/download/mixkit-romantic-piano-1603.mp3" type="audio/mpeg">
+        <source src="https://upload.wikimedia.org/wikipedia/commons/0/07/Pachelbel%27s_Canon_in_D_Major.ogg" type="audio/ogg">
+        <source src="https://ia800301.us.archive.org/28/items/PachelbelCanonInDMajor_201603/PachelbelCanonInDMajor.mp3" type="audio/mpeg">
     </audio>
 
-    <div class="music-btn" id="musicBtn" onclick="toggleMusic()">
+    <!-- 點擊提示 -->
+    <div class="music-toast" id="musicToast">✨ 點擊畫面任意處開啟音樂</div>
+
+    <!-- 音樂控制按鈕 -->
+    <div class="music-btn" id="musicBtn" onclick="toggleMusic(event)">
         <span class="music-icon" id="musicIcon">🎵</span>
     </div>
 
@@ -424,8 +453,8 @@
         <div class="v-card" style="margin-bottom: 25px;">
             <h3>時間與地點</h3>
             <p style="margin-bottom: 8px;"><strong>日期：</strong>民國 116 年 1 月 9 日</p>
-            <p style="margin-bottom: 8px;"><strong>時間：</strong>11:30入席;12:30開席</p>
-            <p style="margin-bottom: 20px;"><strong>地點：</strong><span class="no-wrap">芳庭路壹號莊園</span></p>
+            <p style="margin-bottom: 8px;"><strong>時間：</strong>午宴 (請依現場時間入場)</p>
+            <p style="margin-bottom: 20px;"><strong>地址：</strong><span class="no-wrap">臺中市北屯區芳庭路壹號</span></p>
 
             <h3 style="margin-top: 25px;">DRESS CODE</h3>
             <div class="dress-code-box">
@@ -449,7 +478,7 @@
                 <span>+</span>
             </div>
             <div class="accordion-content">
-                <p>地點位於 <span class="no-wrap">臺中市北屯區芳庭路壹號</span>（芳庭路壹號莊園），建議自行開車或搭乘計程車前往，會場備有專屬停車場供賓客使用。</p>
+                <p>地點位於 <span class="no-wrap">臺中市北屯區芳庭路壹號</span>（心之芳庭），建議自行開車或搭乘計程車前往，會場備有專屬停車場供賓客使用。</p>
             </div>
         </div>
     </section>
@@ -524,20 +553,32 @@
     <script>
         var submitted = false;
 
-        // 音樂播映雙重保障機制
         let isPlaying = false;
         const audio = document.getElementById("bgm");
         const musicBtn = document.getElementById("musicBtn");
         const musicIcon = document.getElementById("musicIcon");
 
-        function toggleMusic() {
+        function playMusic() {
             if (!isPlaying) {
                 audio.play().then(() => {
                     isPlaying = true;
                     musicBtn.classList.add("playing");
                     musicIcon.innerText = "🎵";
-                }).catch(() => {
-                    console.log("Audio play error");
+                }).catch((err) => {
+                    console.log("Autoplay blocked or error:", err);
+                });
+            }
+        }
+
+        function toggleMusic(e) {
+            if (e) e.stopPropagation();
+            if (!isPlaying) {
+                audio.play().then(() => {
+                    isPlaying = true;
+                    musicBtn.classList.add("playing");
+                    musicIcon.innerText = "🎵";
+                }).catch((err) => {
+                    console.log("Play error:", err);
                 });
             } else {
                 audio.pause();
@@ -547,12 +588,14 @@
             }
         }
 
-        // 頁面任意點擊觸發播放
-        document.addEventListener('click', function startAudioOnInteraction() {
-            if (!isPlaying) {
-                toggleMusic();
-            }
-        }, { once: true });
+        // 監聽點擊/觸控事件以解鎖瀏覽器自動播放限制
+        ['click', 'touchstart'].forEach(eventType => {
+            document.addEventListener(eventType, function startAudioOnInteraction() {
+                if (!isPlaying) {
+                    playMusic();
+                }
+            }, { once: true });
+        });
 
         // 倒數計時器
         const targetDate = new Date("Jan 9, 2027 12:00:00").getTime();

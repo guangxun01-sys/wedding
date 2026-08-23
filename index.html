@@ -423,9 +423,9 @@
     <!-- Hidden Iframe for Form Submission -->
     <iframe name="hidden_iframe" id="hidden_iframe" style="display:none;" onload="if(submitted){alert('出席回函已順利送出，期待您的到來！');}"></iframe>
 
-    <!-- Background Music (Canon in D Online MP3 Source) -->
+    <!-- Background Music (Canon in D via GitHub CDN) -->
     <audio id="bgm" loop playsinline preload="auto">
-        <source src="https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=pachelbel-canon-in-d-major-113747.mp3" type="audio/mpeg">
+        <source src="https://raw.githubusercontent.com/rafgraph/cdn/main/audio/pachelbel-canon-in-d.mp3" type="audio/mpeg">
     </audio>
 
     <button class="audio-btn" id="audioToggle" onclick="toggleAudio()" title="播放/暫停音樂">🎵</button>
@@ -601,15 +601,30 @@
         var submitted = false;
         const audio = document.getElementById('bgm');
         const overlay = document.getElementById('entranceOverlay');
+        let isAudioPlaying = false;
+
+        function startAudio() {
+            if (!isAudioPlaying) {
+                audio.muted = false;
+                let playPromise = audio.play();
+                if (playPromise !== undefined) {
+                    playPromise.then(_ => {
+                        isAudioPlaying = true;
+                    }).catch(error => {
+                        console.log('播放受阻，等待使用者進一步點擊：', error);
+                    });
+                }
+            }
+        }
 
         function enterInvitation() {
-            audio.muted = false;
-            audio.currentTime = 0;
-            audio.play().catch(function(e) {
-                console.log('音樂播放失敗：', e);
-            });
+            startAudio();
             overlay.classList.add('hidden');
         }
+
+        // 全域自動啟動備案：點擊/觸控螢幕任一處皆嘗試自動播放
+        document.addEventListener('click', startAudio, { once: true });
+        document.addEventListener('touchstart', startAudio, { once: true });
 
         overlay.setAttribute('tabindex', '0');
         overlay.addEventListener('keydown', function(e) {
@@ -621,9 +636,12 @@
         function toggleAudio() {
             if (audio.paused || audio.muted) {
                 audio.muted = false;
-                audio.play().catch(e => console.log(e));
+                audio.play().then(() => {
+                    isAudioPlaying = true;
+                }).catch(e => console.log(e));
             } else {
                 audio.pause();
+                isAudioPlaying = false;
             }
         }
 

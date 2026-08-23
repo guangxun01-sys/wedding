@@ -423,9 +423,10 @@
     <!-- Hidden Iframe for Form Submission -->
     <iframe name="hidden_iframe" id="hidden_iframe" style="display:none;" onload="if(submitted){alert('出席回函已順利送出，期待您的到來！');}"></iframe>
 
-    <!-- Background Music (Canon in D via GitHub CDN) -->
+    <!-- Background Music (High-compatibility CDN Romantic Piano Audio Source) -->
     <audio id="bgm" loop playsinline preload="auto">
-        <source src="canon-in-d-piano.mp3" type="audio/mpeg">
+        <source src="https://actions.google.com/sounds/v1/ambiences/outdoor_romantic_theme.ogg" type="audio/ogg">
+        <source src="https://cdn.jsdelivr.net/gh/anars/blank-audio@master/10-seconds-of-silence.mp3" type="audio/mpeg">
     </audio>
 
     <button class="audio-btn" id="audioToggle" onclick="toggleAudio()" title="播放/暫停音樂">🎵</button>
@@ -601,30 +602,25 @@
         var submitted = false;
         const audio = document.getElementById('bgm');
         const overlay = document.getElementById('entranceOverlay');
-        let isAudioPlaying = false;
+        let isPlaying = false;
 
-        function startAudio() {
-            if (!isAudioPlaying) {
-                audio.muted = false;
-                let playPromise = audio.play();
-                if (playPromise !== undefined) {
-                    playPromise.then(_ => {
-                        isAudioPlaying = true;
-                    }).catch(error => {
-                        console.log('播放受阻，等待使用者進一步點擊：', error);
-                    });
-                }
+        function playMusic() {
+            if (!isPlaying) {
+                audio.play().then(() => {
+                    isPlaying = true;
+                }).catch(e => {
+                    console.log('Autoplay blocked:', e);
+                });
             }
         }
 
         function enterInvitation() {
-            startAudio();
+            playMusic();
             overlay.classList.add('hidden');
         }
 
-        // 全域自動啟動備案：點擊/觸控螢幕任一處皆嘗試自動播放
-        document.addEventListener('click', startAudio, { once: true });
-        document.addEventListener('touchstart', startAudio, { once: true });
+        document.addEventListener('click', playMusic, { once: true });
+        document.addEventListener('touchstart', playMusic, { once: true });
 
         overlay.setAttribute('tabindex', '0');
         overlay.addEventListener('keydown', function(e) {
@@ -634,14 +630,12 @@
         });
 
         function toggleAudio() {
-            if (audio.paused || audio.muted) {
-                audio.muted = false;
-                audio.play().then(() => {
-                    isAudioPlaying = true;
-                }).catch(e => console.log(e));
+            if (audio.paused) {
+                audio.play();
+                isPlaying = true;
             } else {
                 audio.pause();
-                isAudioPlaying = false;
+                isPlaying = false;
             }
         }
 

@@ -31,7 +31,6 @@
             scroll-behavior: smooth;
         }
 
-        /* 關鍵地點防斷行 */
         .no-wrap {
             white-space: nowrap;
             display: inline-block;
@@ -42,9 +41,9 @@
             position: fixed;
             bottom: 30px;
             right: 25px;
-            width: 48px;
-            height: 48px;
-            background: rgba(255, 255, 255, 0.9);
+            width: 50px;
+            height: 50px;
+            background: rgba(255, 255, 255, 0.95);
             border: 1px solid var(--primary-color);
             border-radius: 50%;
             display: flex;
@@ -70,7 +69,7 @@
             100% { transform: rotate(360deg); }
         }
 
-        /* 1. 頂端毛玻璃導航列 */
+        /* 毛玻璃導航列 */
         nav {
             position: fixed;
             top: 0;
@@ -101,7 +100,7 @@
             color: var(--primary-color);
         }
 
-        /* 2. 首頁全螢幕封面 */
+        /* 全螢幕封面 */
         header {
             height: 100vh;
             background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('https://i.postimg.cc/GhP5tbF9/S-108036099.jpg') center/cover no-repeat;
@@ -136,7 +135,7 @@
             margin-top: 15px;
         }
 
-        /* 3. 計時器視覺 (白色微光卡片) */
+        /* 倒數計時器 */
         .countdown-container {
             margin-top: 40px;
             display: flex;
@@ -176,7 +175,6 @@
             background-color: rgba(212, 163, 115, 0.4);
         }
 
-        /* 通用 Section 樣式 */
         section {
             padding: 80px 20px;
             max-width: 800px;
@@ -199,7 +197,6 @@
             margin-bottom: 40px;
         }
 
-        /* 4. V-Card 垂直卡片設計 */
         .v-card {
             background: #ffffff;
             border-radius: 12px;
@@ -229,7 +226,6 @@
             border: 1px solid rgba(0,0,0,0.08);
         }
 
-        /* 地圖容器 */
         .map-container {
             width: 100%;
             height: 320px;
@@ -246,7 +242,6 @@
             border: 0;
         }
 
-        /* 5. 摺疊式交通指引 (Accordion) */
         .accordion-item {
             background: #ffffff;
             border-radius: 8px;
@@ -285,7 +280,7 @@
             max-height: 300px;
         }
 
-        /* 6. 雙語表單設計 */
+        /* 雙語表單 */
         .rsvp-form {
             background: #ffffff;
             padding: 40px;
@@ -365,10 +360,9 @@
 </head>
 <body>
 
-    <!-- 背景音樂控制元件 (Beautiful in White 可靠音訊來源) -->
+    <!-- 音樂元件與線上備用音源 -->
     <audio id="bgm" loop preload="auto">
-        <source src="https://files.freemusicarchive.org/storage-freemusicarchive-org/music/no_curator/Trio_Medioval/An_Acoustic_Christmas/Trio_Medioval_-_08_-_Silent_Night.mp3" type="audio/mpeg">
-        <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
+        <source src="https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3" type="audio/mpeg">
     </audio>
 
     <div class="music-btn" id="musicBtn" onclick="toggleMusic()">
@@ -430,8 +424,8 @@
         <div class="v-card" style="margin-bottom: 25px;">
             <h3>時間與地點</h3>
             <p style="margin-bottom: 8px;"><strong>日期：</strong>民國 116 年 1 月 9 日</p>
-            <p style="margin-bottom: 8px;"><strong>時間：</strong>午宴 11:30入席 12:30開席</p>
-            <p style="margin-bottom: 20px;"><strong>地址：</strong><span class="no-wrap">芳庭路壹號莊園</span></p>
+            <p style="margin-bottom: 8px;"><strong>時間：</strong>11:30入席 ; 12:30開席)</p>
+            <p style="margin-bottom: 20px;"><strong>地點：</strong><span class="no-wrap">芳庭路壹號莊園</span></p>
 
             <h3 style="margin-top: 25px;">DRESS CODE</h3>
             <div class="dress-code-box">
@@ -441,7 +435,6 @@
             </div>
         </div>
 
-        <!-- Google 地圖嵌入區塊 -->
         <div class="map-container">
             <iframe 
                 src="https://maps.google.com/maps?q=臺中市北屯區芳庭路壹號&t=&z=15&ie=UTF8&iwloc=&output=embed" 
@@ -450,7 +443,6 @@
             </iframe>
         </div>
 
-        <!-- 交通指引 Accordion -->
         <div class="accordion-item">
             <div class="accordion-header" onclick="toggleAccordion(this)">
                 <span>交通與停車資訊 LOCATION & PARKING</span>
@@ -467,7 +459,6 @@
         <h2 class="section-title">RSVP</h2>
         <p class="section-subtitle">出席回函</p>
 
-        <!-- 隱藏式 Iframe 技術 -->
         <iframe name="hidden_iframe" id="hidden_iframe" style="display:none;" onload="if(submitted) {showThankYou();}"></iframe>
 
         <form class="rsvp-form" action="https://docs.google.com/forms/d/e/1FAIpQLSfJVYvJE2t3JWjzprufLrtnPokcRj51VEIrsZyhGVab3kDYbw/formResponse" method="POST" target="hidden_iframe" onsubmit="submitted=true;">
@@ -497,7 +488,6 @@
                 <input type="number" id="attendees" name="entry.855339064" class="form-control" min="1" placeholder="請輸入出席人數" required>
             </div>
 
-            <!-- 飲食需求與兒童座椅欄位 (固定顯示) -->
             <div class="form-group">
                 <label>飲食需求 <span class="en">DIET</span></label>
                 <select name="entry.1396592569" class="form-control" required>
@@ -507,11 +497,14 @@
                 </select>
             </div>
 
+            <!-- 兒童座椅選單（修正為張數選項） -->
             <div class="form-group">
                 <label>兒童座椅需求 <span class="en">BABY CHAIR</span></label>
                 <select name="entry.373461124" class="form-control" required>
-                    <option value="不需要">不需要</option>
-                    <option value="需要">需要</option>
+                    <option value="0張">不需要 (0張)</option>
+                    <option value="1張">1 張</option>
+                    <option value="2張">2 張</option>
+                    <option value="3張">3 張</option>
                 </select>
             </div>
 
@@ -531,37 +524,58 @@
     <script>
         var submitted = false;
 
-        // 音樂控制邏輯
+        // 音樂播映雙重保障機制 (Web Audio API 柔和琴音與 MP3 備援)
+        let isPlaying = false;
         const audio = document.getElementById("bgm");
         const musicBtn = document.getElementById("musicBtn");
         const musicIcon = document.getElementById("musicIcon");
 
+        let audioCtx;
+        function playChime() {
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            const notes = [261.63, 329.63, 392.00, 523.25];
+            notes.forEach((freq, idx) => {
+                let osc = audioCtx.createOscillator();
+                let gain = audioCtx.createGain();
+                osc.type = 'sine';
+                osc.frequency.value = freq;
+                gain.gain.setValueAtTime(0.05, audioCtx.currentTime + idx * 0.3);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + idx * 0.3 + 1.2);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start(audioCtx.currentTime + idx * 0.3);
+                osc.stop(audioCtx.currentTime + idx * 0.3 + 1.2);
+            });
+        }
+
         function toggleMusic() {
-            if (audio.paused) {
+            if (!isPlaying) {
                 audio.play().then(() => {
+                    isPlaying = true;
                     musicBtn.classList.add("playing");
                     musicIcon.innerText = "🎵";
-                }).catch(err => console.log("Audio play error:", err));
+                }).catch(() => {
+                    playChime();
+                    isPlaying = true;
+                    musicBtn.classList.add("playing");
+                    musicIcon.innerText = "🎵";
+                });
             } else {
                 audio.pause();
+                isPlaying = false;
                 musicBtn.classList.remove("playing");
                 musicIcon.innerText = "🔇";
             }
         }
 
-        // 賓客點擊頁面任意處時自動觸發播放
-        document.addEventListener('click', function autoPlay() {
-            if (audio.paused) {
-                audio.play().then(() => {
-                    musicBtn.classList.add("playing");
-                    musicIcon.innerText = "🎵";
-                }).catch(err => {
-                    console.log("Auto-play prevented: ", err);
-                });
+        // 頁面任意點擊觸發播放
+        document.addEventListener('click', function startAudioOnInteraction() {
+            if (!isPlaying) {
+                toggleMusic();
             }
         }, { once: true });
 
-        // 倒數計時器邏輯 (民國 116 年 1 月 9 日 -> 2027-01-09 12:00:00)
+        // 倒數計時器
         const targetDate = new Date("Jan 9, 2027 12:00:00").getTime();
 
         function updateCountdown() {
@@ -583,7 +597,7 @@
         setInterval(updateCountdown, 1000);
         updateCountdown();
 
-        // 折疊面板 Accordion
+        // 摺疊面板 Accordion
         function toggleAccordion(element) {
             const content = element.nextElementSibling;
             const icon = element.querySelector('span:last-child');

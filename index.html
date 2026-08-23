@@ -421,15 +421,17 @@
 </head>
 <body>
 
+    <!-- 手機與電腦音樂解鎖遮罩 (英式街頭浪漫主題) -->
     <div id="welcome-overlay">
         <h2>OSCAR & ANN</h2>
-        <p>誠摯邀請您一起來相聚</p>
+        <p>誠摯邀請您一同感受英式街頭浪漫</p>
         <button class="enter-btn" onclick="openInvitation()">開啟婚禮邀請函 🎵</button>
     </div>
 
-    <!-- 日式溫馨浪漫鋼琴曲 (高穩定度無版權直連音源) -->
-    <audio id="bgm" loop preload="auto">
-        <source src="https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf756.mp3?filename=gentle-romantic-piano-110463.mp3" type="audio/mpeg">
+    <!-- 英式街頭浪漫風格音源 (多重高穩定備援音源) -->
+    <audio id="bgm" loop preload="auto" crossorigin="anonymous">
+        <source src="https://assets.mixkit.co/music/preview/mixkit-romantic-wedding-card-657.mp3" type="audio/mpeg">
+        <source src="https://raw.githubusercontent.com/rafaelreis-hotmart/Audio-Samples/main/acoustic-romantic.mp3" type="audio/mpeg">
     </audio>
 
     <div class="music-btn" id="musicBtn" onclick="toggleMusic()">
@@ -589,44 +591,190 @@
     </section>
 
     <script>
+        // 英式街頭浪漫音樂雙引擎控制器 (Web Audio + HTML5 Audio)
+        class BritishRomanticAudioEngine {
+            constructor() {
+                this.ctx = null;
+                this.isPlaying = false;
+                this.timer = null;
+                this.currentStep = 0;
+                this.bgmAudio = document.getElementById("bgm");
+                this.useSynth = false;
+            }
+
+            initContext() {
+                if (!this.ctx) {
+                    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+                    if (AudioCtx) {
+                        this.ctx = new AudioCtx();
+                    }
+                }
+                if (this.ctx && this.ctx.state === 'suspended') {
+                    this.ctx.resume();
+                }
+            }
+
+            // 模擬英式街頭木吉他與電鋼琴撥弦音色
+            pluckGuitar(freq, time, duration = 1.6, gainVal = 0.2, isBass = false) {
+                if (!this.ctx) return;
+                try {
+                    const osc1 = this.ctx.createOscillator();
+                    const osc2 = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+                    const filter = this.ctx.createBiquadFilter();
+
+                    osc1.type = isBass ? 'sine' : 'triangle';
+                    osc2.type = 'sine';
+
+                    osc1.frequency.setValueAtTime(freq, time);
+                    osc2.frequency.setValueAtTime(freq * 2.002, time); // 微幅泛音，營造溫暖木質殘響
+
+                    filter.type = 'lowpass';
+                    filter.frequency.setValueAtTime(isBass ? 600 : 2200, time);
+                    filter.frequency.exponentialRampToValueAtTime(150, time + duration);
+
+                    gain.gain.setValueAtTime(0, time);
+                    gain.gain.linearRampToValueAtTime(gainVal, time + 0.02);
+                    gain.gain.exponentialRampToValueAtTime(0.0001, time + duration);
+
+                    osc1.connect(filter);
+                    osc2.connect(filter);
+                    filter.connect(gain);
+                    gain.connect(this.ctx.destination);
+
+                    osc1.start(time);
+                    osc2.start(time);
+                    osc1.stop(time + duration);
+                    osc2.stop(time + duration);
+                } catch (e) {
+                    console.log("Audio synthesis note error:", e);
+                }
+            }
+
+            // 英式街頭浪漫和弦循環 (Cmaj7 - Am7 - Fmaj7 - G13)
+            playSynthLoop() {
+                const chords = [
+                    { bass: 130.81, arpeggio: [261.63, 329.63, 392.00, 493.88, 523.25] }, // Cmaj7
+                    { bass: 110.00, arpeggio: [220.00, 261.63, 329.63, 392.00, 523.25] }, // Am7
+                    { bass: 87.31,  arpeggio: [174.61, 220.00, 261.63, 329.63, 392.00] }, // Fmaj7
+                    { bass: 98.00,  arpeggio: [196.00, 246.94, 293.66, 349.23, 440.00] }  // G13
+                ];
+
+                const melodyNotes = [
+                    523.25, 587.33, 659.25, 587.33, 493.88, 523.25, 587.33, 493.88,
+                    440.00, 493.88, 523.25, 659.25, 587.33, 493.88, 392.00, 440.00
+                ];
+
+                const tempo = 72;
+                const stepTime = (60 / tempo) / 2;
+
+                const scheduleNext = () => {
+                    if (!this.isPlaying || !this.useSynth) return;
+                    const now = this.ctx.currentTime;
+                    const chordIdx = Math.floor(this.currentStep / 8) % chords.length;
+                    const stepInChord = this.currentStep % 8;
+                    const chord = chords[chordIdx];
+
+                    // Bass 音
+                    if (stepInChord === 0 || stepInChord === 4) {
+                        this.pluckGuitar(chord.bass, now, 2.2, 0.22, true);
+                    }
+
+                    // 吉他分解和弦
+                    const arpNote = chord.arpeggio[stepInChord % chord.arpeggio.length];
+                    this.pluckGuitar(arpNote, now, 1.2, 0.12, false);
+
+                    // 浪漫街頭主音
+                    if (stepInChord === 2 || stepInChord === 6) {
+                        const melNote = melodyNotes[Math.floor(this.currentStep / 2) % melodyNotes.length];
+                        this.pluckGuitar(melNote, now + 0.04, 1.5, 0.14, false);
+                    }
+
+                    this.currentStep++;
+                    this.timer = setTimeout(scheduleNext, stepTime * 1000);
+                };
+
+                scheduleNext();
+            }
+
+            play() {
+                this.initContext();
+                this.isPlaying = true;
+
+                if (this.bgmAudio) {
+                    this.bgmAudio.volume = 0.85;
+                    const playPromise = this.bgmAudio.play();
+                    if (playPromise !== undefined) {
+                        playPromise.then(() => {
+                            this.useSynth = false;
+                        }).catch((err) => {
+                            console.log("External audio blocked or failed, switching to Web Audio Synthesizer:", err);
+                            this.useSynth = true;
+                            this.playSynthLoop();
+                        });
+                    }
+                } else {
+                    this.useSynth = true;
+                    this.playSynthLoop();
+                }
+            }
+
+            pause() {
+                this.isPlaying = false;
+                if (this.timer) clearTimeout(this.timer);
+                if (this.bgmAudio) this.bgmAudio.pause();
+            }
+        }
+
+        const audioEngine = new BritishRomanticAudioEngine();
         let isPlaying = false;
-        const audio = document.getElementById("bgm");
         const musicBtn = document.getElementById("musicBtn");
         const musicIcon = document.getElementById("musicIcon");
         const welcomeOverlay = document.getElementById("welcome-overlay");
 
-        // 手機解鎖音樂互動按鈕 (完美繞過瀏覽器自動播放限制)
-        function openInvitation() {
-            audio.play().then(() => {
+        function startAudio() {
+            if (!isPlaying) {
+                audioEngine.play();
                 isPlaying = true;
                 musicBtn.classList.add("playing");
                 musicIcon.innerText = "🎵";
-            }).catch((err) => {
-                console.log("Audio play blocked or error:", err);
-            });
+            }
+        }
 
+        // 開啟邀請函並啟動音樂
+        function openInvitation() {
+            startAudio();
             welcomeOverlay.style.opacity = '0';
             setTimeout(() => {
                 welcomeOverlay.style.display = 'none';
             }, 600);
         }
 
+        // 手動開關音樂按鈕
         function toggleMusic() {
             if (!isPlaying) {
-                audio.play().then(() => {
-                    isPlaying = true;
-                    musicBtn.classList.add("playing");
-                    musicIcon.innerText = "🎵";
-                }).catch(() => {
-                    console.log("Audio play error");
-                });
+                startAudio();
             } else {
-                audio.pause();
+                audioEngine.pause();
                 isPlaying = false;
                 musicBtn.classList.remove("playing");
                 musicIcon.innerText = "🔇";
             }
         }
+
+        // 嘗試在載入時直接自動播放 (適用於允許直接播放的電腦/瀏覽器)
+        window.addEventListener('DOMContentLoaded', () => {
+            startAudio();
+        });
+
+        // 螢幕任意點擊/觸控解鎖機制 (確保手機與各類瀏覽器無障礙順暢播放)
+        const unlockAudioOnInteraction = () => {
+            startAudio();
+        };
+
+        ['click', 'touchstart', 'pointerdown', 'keydown', 'scroll'].forEach(eventType => {
+            window.addEventListener(eventType, unlockAudioOnInteraction, { once: true });
+        });
 
         // 倒數計時器 (116年1月9日 12:00:00，即 2027年1月9日 12:00:00)
         const targetDate = new Date("Jan 9, 2027 12:00:00").getTime();

@@ -1,82 +1,134 @@
 <!DOCTYPE html>
-<html lang="zh-Hant">
+<html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>婚禮邀請函 | Wedding Invitation</title>
-    <!-- Google Fonts: Cormorant Garamond & Noto Serif TC -->
+    <title>OSCAR & ANN Wedding Invitation</title>
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Noto+Serif+TC:wght@300;400;600&display=swap" rel="stylesheet">
-    
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Noto+Serif+TC:wght@400;600;700&display=swap" rel="stylesheet">
+
     <style>
         :root {
-            --morandi-warm: #d4a373;
-            --morandi-sage: #8da399;
-            --morandi-bg: #f7f5f0;
-            --text-dark: #2c302e;
-            --text-light: #666666;
-            --white-glow: rgba(255, 255, 255, 0.85);
-            --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
-            --glass-bg: rgba(255, 255, 255, 0.7);
+            --primary: #d4a373;
+            --secondary: #8da399;
+            --bg-light: #fdfbf7;
+            --text-dark: #333333;
+            --card-bg: rgba(255, 255, 255, 0.9);
         }
-
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-        }
-
-        body {
-            font-family: 'Noto Serif TC', serif;
-            background-color: var(--morandi-bg);
-            color: var(--text-dark);
-            line-height: 1.6;
             scroll-behavior: smooth;
         }
-
+        body {
+            font-family: 'Noto Serif TC', serif;
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            line-height: 1.6;
+        }
         .en-font {
             font-family: 'Cormorant Garamond', serif;
         }
-
-        /* 避免關鍵文字斷行 */
         .no-wrap {
             white-space: nowrap;
         }
 
-        /* 固定毛玻璃導覽列 */
+        /* ====== Entrance Overlay ====== */
+        #entranceOverlay {
+            position: fixed;
+            inset: 0;
+            z-index: 3000;
+            background: linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.45)), url('https://i.postimg.cc/GhP5tbF9/S-108036099.jpg') center/cover no-repeat;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            color: #ffffff;
+            cursor: pointer;
+            transition: opacity 0.6s ease, visibility 0.6s ease;
+            padding: 0 1.5rem;
+        }
+        #entranceOverlay.hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+        #entranceOverlay h2 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 2.2rem;
+            letter-spacing: 3px;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+        #entranceOverlay p {
+            font-size: 1rem;
+            letter-spacing: 1px;
+            opacity: 0.9;
+            margin-bottom: 2rem;
+        }
+        .enter-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.6rem;
+            padding: 0.9rem 2.2rem;
+            border: 1.5px solid rgba(255,255,255,0.8);
+            border-radius: 50px;
+            font-size: 1rem;
+            letter-spacing: 2px;
+            color: #fff;
+            background: rgba(255,255,255,0.12);
+            backdrop-filter: blur(4px);
+            animation: pulseGlow 2.2s ease-in-out infinite;
+        }
+        @keyframes pulseGlow {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(255,255,255,0.35); }
+            50% { box-shadow: 0 0 0 12px rgba(255,255,255,0); }
+        }
+
+        /* Fixed Frosted Glass Nav */
         nav {
             position: fixed;
             top: 0;
-            left: 0;
             width: 100%;
             z-index: 1000;
-            background: var(--glass-bg);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.65);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(212, 163, 115, 0.2);
             display: flex;
-            justify-content: space-around;
+            justify-content: space-between;
             align-items: center;
-            padding: 1rem 0;
+            padding: 1rem 2rem;
         }
-
+        nav .logo {
+            font-size: 1.2rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            color: var(--primary);
+        }
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 1.5rem;
+        }
         nav a {
             text-decoration: none;
             color: var(--text-dark);
             font-size: 0.95rem;
-            letter-spacing: 1px;
-            transition: color 0.3s ease;
+            transition: color 0.3s;
         }
-
         nav a:hover {
-            color: var(--morandi-warm);
+            color: var(--primary);
         }
 
-        /* 全螢幕首頁封面 */
-        header.hero {
+        /* Hero Section */
+        header {
             height: 100vh;
-            background: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), url('https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=1920&q=80') center/cover no-repeat;
+            background: linear-gradient(rgba(0,0,0,0.35), rgba(0,0,0,0.35)), url('https://i.postimg.cc/GhP5tbF9/S-108036099.jpg') center/cover no-repeat;
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -85,125 +137,140 @@
             color: #ffffff;
             padding: 0 1rem;
         }
-
-        header.hero h1 {
-            font-size: 3.5rem;
-            font-weight: 400;
-            letter-spacing: 2px;
+        header h1 {
+            font-size: 3.2rem;
+            letter-spacing: 4px;
             margin-bottom: 0.5rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+        header p.slogan {
+            font-size: 1.4rem;
+            letter-spacing: 2px;
+            margin-bottom: 0.2rem;
+            font-weight: 400;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+        }
+        header p.slogan-en {
+            font-size: 1.1rem;
+            letter-spacing: 1px;
+            margin-bottom: 2rem;
+            font-weight: 300;
+            opacity: 0.9;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
         }
 
-        header.hero p {
-            font-size: 1.2rem;
-            letter-spacing: 3px;
+        /* Countdown Timer */
+        .timer-container {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        .timer-card {
+            background: rgba(255, 255, 255, 0.9);
+            color: var(--text-dark);
+            padding: 0.8rem 1.2rem;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+        .timer-val {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        .timer-unit {
+            font-size: 0.85rem;
+            color: #666;
+        }
+        .timer-divider {
+            width: 1px;
+            height: 25px;
+            background-color: rgba(0,0,0,0.15);
         }
 
+        /* Main Content Container */
         .container {
             max-width: 800px;
             margin: 0 auto;
             padding: 4rem 1.5rem;
         }
 
-        /* 計時器區塊 */
-        .timer-section {
-            text-align: center;
+        /* Section Styling */
+        section {
             margin-bottom: 4rem;
         }
-
         .section-title {
             text-align: center;
-            font-size: 1.8rem;
-            color: var(--morandi-warm);
-            margin-bottom: 0.3rem;
+            font-size: 2rem;
+            color: var(--primary);
+            margin-bottom: 2rem;
+            position: relative;
+        }
+        .section-title::after {
+            content: '';
+            display: block;
+            width: 50px;
+            height: 2px;
+            background: var(--secondary);
+            margin: 0.5rem auto 0;
         }
 
-        .section-subtitle {
+        /* V-Card Design */
+        .v-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 2.5rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            border: 1px solid rgba(212, 163, 115, 0.15);
             text-align: center;
-            font-size: 0.9rem;
-            color: var(--morandi-sage);
-            letter-spacing: 2px;
             margin-bottom: 2rem;
         }
-
-        .countdown-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 0.5rem;
-            flex-wrap: nowrap;
-        }
-
-        .time-card {
-            background: var(--white-glow);
-            padding: 1rem 1.2rem;
-            border-radius: 12px;
-            box-shadow: var(--card-shadow);
-            min-width: 70px;
-            text-align: center;
-            backdrop-filter: blur(5px);
-        }
-
-        .time-card .number {
-            font-size: 2rem;
-            font-weight: 600;
-            color: var(--morandi-warm);
-            line-height: 1;
-        }
-
-        .time-card .label {
-            font-size: 0.75rem;
-            color: var(--text-light);
-            margin-top: 0.3rem;
-            letter-spacing: 1px;
-        }
-
-        .divider {
-            height: 35px;
-            width: 1px;
-            background-color: var(--morandi-sage);
-            opacity: 0.4;
-        }
-
-        /* Vertical V-Card 垂直名片設計 */
-        .v-card {
-            background: #ffffff;
-            border-radius: 16px;
-            padding: 2.5rem 2rem;
-            box-shadow: var(--card-shadow);
-            margin-bottom: 3rem;
-            text-align: center;
-            border: 1px solid rgba(212, 163, 115, 0.2);
-        }
-
         .v-card-item {
             margin-bottom: 1.5rem;
         }
-
         .v-card-item:last-child {
             margin-bottom: 0;
         }
-
         .v-card-label {
-            font-size: 0.85rem;
-            color: var(--morandi-sage);
-            letter-spacing: 1px;
-            margin-bottom: 0.2rem;
-        }
-
-        .v-card-val {
+            font-weight: 600;
+            color: var(--secondary);
             font-size: 1.1rem;
-            color: var(--text-dark);
+            margin-bottom: 0.3rem;
+        }
+        .v-card-value {
+            font-size: 1.05rem;
+        }
+        .color-dots {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 0.5rem;
+        }
+        .dot {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: inline-block;
+            border: 1px solid rgba(0,0,0,0.1);
         }
 
-        /* 摺疊式面板 (Accordion) */
-        .accordion-item {
-            background: #ffffff;
+        /* Accordion */
+        .accordion {
+            background-color: var(--card-bg);
+            border: 1px solid rgba(212, 163, 115, 0.2);
             border-radius: 12px;
-            margin-bottom: 1rem;
-            box-shadow: var(--card-shadow);
             overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+            margin-bottom: 1.5rem;
         }
-
+        .accordion-item {
+            border-bottom: 1px solid rgba(212, 163, 115, 0.15);
+        }
+        .accordion-item:last-child {
+            border-bottom: none;
+        }
         .accordion-header {
             width: 100%;
             padding: 1.2rem;
@@ -211,286 +278,361 @@
             border: none;
             text-align: left;
             font-size: 1.05rem;
-            font-family: inherit;
+            font-weight: 600;
             color: var(--text-dark);
             cursor: pointer;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-weight: 600;
+            transition: background 0.3s;
+            font-family: inherit;
         }
-
+        .accordion-header:hover {
+            background-color: rgba(212, 163, 115, 0.05);
+        }
         .accordion-content {
             max-height: 0;
             overflow: hidden;
             transition: max-height 0.3s ease-out, padding 0.3s ease;
-            background-color: #fafafa;
             padding: 0 1.2rem;
-        }
-
-        .accordion-content p {
-            color: var(--text-light);
+            background-color: #ffffff;
             font-size: 0.95rem;
-            line-height: 1.8;
-            padding: 1rem 0;
+            color: #555;
+        }
+        .accordion-content.active {
+            padding: 1.2rem;
+            max-height: 400px;
         }
 
-        /* 表單樣式 */
+        /* Map Container */
+        .map-wrapper {
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            border: 1px solid rgba(212, 163, 115, 0.2);
+            margin-top: 1rem;
+        }
+        .map-wrapper iframe {
+            width: 100%;
+            height: 320px;
+            border: 0;
+        }
+        .map-btn {
+            display: inline-block;
+            margin-top: 0.8rem;
+            padding: 0.6rem 1.2rem;
+            background-color: var(--secondary);
+            color: #fff;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            transition: background 0.3s;
+        }
+        .map-btn:hover {
+            background-color: #728a80;
+        }
+
+        /* Form Styling */
+        .rsvp-form {
+            background: var(--card-bg);
+            padding: 2.5rem;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            border: 1px solid rgba(212, 163, 115, 0.15);
+        }
         .form-group {
             margin-bottom: 1.5rem;
-            text-align: left;
         }
-
-        label {
+        .form-group label {
             display: block;
             margin-bottom: 0.5rem;
-            font-size: 0.9rem;
-            color: var(--text-dark);
             font-weight: 600;
+            color: var(--text-dark);
+            font-size: 0.95rem;
         }
-
-        label span.en-label {
+        .form-group label span.en-label {
             font-family: 'Cormorant Garamond', serif;
-            font-size: 0.85rem;
-            color: var(--morandi-sage);
-            margin-left: 0.3rem;
-            font-weight: normal;
+            color: var(--secondary);
+            font-size: 0.9rem;
+            margin-left: 5px;
         }
-
-        input[type="text"], input[type="number"], select {
+        .form-control {
             width: 100%;
-            padding: 0.8rem 1rem;
+            padding: 0.8rem;
             border: 1px solid #ddd;
             border-radius: 8px;
             font-family: inherit;
             font-size: 1rem;
-            background-color: #fff;
+            outline: none;
             transition: border-color 0.3s;
         }
-
-        input[type="text"]:focus, input[type="number"]:focus, select:focus {
-            outline: none;
-            border-color: var(--morandi-warm);
+        .form-control:focus {
+            border-color: var(--primary);
         }
-
-        /* 動態顯示區塊 */
-        .dynamic-field {
+        .conditional-field {
             display: none;
         }
-
-        button.submit-btn {
+        .btn-submit {
             width: 100%;
             padding: 1rem;
-            background-color: var(--morandi-warm);
-            color: #ffffff;
+            background-color: var(--primary);
+            color: white;
             border: none;
             border-radius: 8px;
-            font-size: 1.05rem;
+            font-size: 1.1rem;
+            font-weight: 600;
             cursor: pointer;
             transition: background 0.3s;
             font-family: inherit;
-            letter-spacing: 2px;
+        }
+        .btn-submit:hover {
+            background-color: #c08d5e;
         }
 
-        button.submit-btn:hover {
-            background-color: #c08f60;
+        /* Audio Control Button */
+        .audio-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+            background: var(--primary);
+            color: white;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            cursor: pointer;
+            border: none;
         }
-
-        /* 隱藏的 iframe 用於背景提交 */
-        #hidden_iframe {
-            display: none;
-        }
-
-        /* 響應式優化 */
         @media (max-width: 600px) {
-            header.hero h1 {
-                font-size: 2.5rem;
-            }
-            .time-card {
-                min-width: 55px;
-                padding: 0.8rem 0.5rem;
-            }
-            .time-card .number {
-                font-size: 1.5rem;
-            }
+            header h1 { font-size: 2.2rem; }
+            header p.slogan { font-size: 1.2rem; }
+            header p.slogan-en { font-size: 0.95rem; }
+            .timer-container { gap: 0.4rem; }
+            .timer-card { padding: 0.5rem 0.6rem; gap: 0.4rem; }
+            .timer-val { font-size: 1.3rem; }
+            nav { padding: 0.8rem 1rem; }
+            nav ul { gap: 0.8rem; }
+            #entranceOverlay h2 { font-size: 1.6rem; }
         }
     </style>
 </head>
 <body>
 
-    <!-- 固定毛玻璃導覽列 -->
+    <!-- Entrance Overlay -->
+    <div id="entranceOverlay" onclick="enterInvitation()">
+        <h2 class="en-font">OSCAR & ANN</h2>
+        <p>點擊進入我們的婚禮邀請函<br class="mobile-break">Tap to enter our wedding invitation</p>
+        <div class="enter-btn">💍 點擊進入 ENTER</div>
+    </div>
+
+    <!-- Hidden Iframe for Form Submission -->
+    <iframe name="hidden_iframe" id="hidden_iframe" style="display:none;" onload="if(submitted){alert('出席回函已順利送出，期待您的到來！');}"></iframe>
+
+    <!-- Background Music -->
+    <audio id="bgm" loop playsinline preload="auto">
+        <source src="canon-in-d-piano.mp3" type="audio/mpeg">
+    </audio>
+
+    <button class="audio-btn" id="audioToggle" onclick="toggleAudio()" title="播放/暫停音樂">🎵</button>
+
+    <!-- Navigation -->
     <nav>
-        <a href="#about">關於我們 <span class="en-font">ABOUT</span></a>
-        <a href="#details">婚禮詳情 <span class="en-font">DETAILS</span></a>
-        <a href="#rsvp">出席回函 <span class="en-font">RSVP</span></a>
+        <div class="logo en-font">OSCAR & ANN</div>
+        <ul>
+            <li><a href="#about">關於我們</a></li>
+            <li><a href="#details">婚禮詳情</a></li>
+            <li><a href="#rsvp">出席回函</a></li>
+        </ul>
     </nav>
 
-    <!-- 全螢幕封面背景 -->
-    <header class="hero">
-        <h1 class="en-font">Alexander & Sophia</h1>
-        <p>誠摯邀請您 見證我們的幸福時刻</p>
+    <!-- Hero Header -->
+    <header id="about">
+        <h1 class="en-font">OSCAR & ANN</h1>
+        <p class="slogan">好久不見，我們婚禮見</p>
+        <p class="slogan-en en-font">Long time no see, see you at our wedding!</p>
+
+        <!-- Timer -->
+        <div class="timer-container" id="countdown">
+            <div class="timer-card">
+                <span class="timer-val en-font" id="days">00</span>
+                <div class="timer-divider"></div>
+                <span class="timer-unit">天</span>
+            </div>
+            <div class="timer-card">
+                <span class="timer-val en-font" id="hours">00</span>
+                <div class="timer-divider"></div>
+                <span class="timer-unit">時</span>
+            </div>
+            <div class="timer-card">
+                <span class="timer-val en-font" id="minutes">00</span>
+                <div class="timer-divider"></div>
+                <span class="timer-unit">分</span>
+            </div>
+            <div class="timer-card">
+                <span class="timer-val en-font" id="seconds">00</span>
+                <div class="timer-divider"></div>
+                <span class="timer-unit">秒</span>
+            </div>
+        </div>
     </header>
 
     <div class="container">
-
-        <!-- 倒數計時器 -->
-        <section id="about" class="timer-section">
-            <h2 class="section-title">Counting Down</h2>
-            <p class="section-subtitle">期待與您相見的每一秒</p>
-
-            <div class="countdown-container">
-                <div class="time-card">
-                    <div class="number en-font" id="days">00</div>
-                    <div class="label en-font">DAYS</div>
-                </div>
-                <div class="divider"></div>
-                <div class="time-card">
-                    <div class="number en-font" id="hours">00</div>
-                    <div class="label en-font">HOURS</div>
-                </div>
-                <div class="divider"></div>
-                <div class="time-card">
-                    <div class="number en-font" id="minutes">00</div>
-                    <div class="label en-font">MINS</div>
-                </div>
-                <div class="divider"></div>
-                <div class="time-card">
-                    <div class="number en-font" id="seconds">00</div>
-                    <div class="label en-font">SECS</div>
-                </div>
-            </div>
-        </section>
-
-        <!-- 婚禮詳情 (Vertical V-Card) -->
+        <!-- Details Section -->
         <section id="details">
-            <h2 class="section-title">Wedding Details</h2>
-            <p class="section-subtitle">婚禮資訊</p>
+            <h2 class="section-title">婚禮詳情 <span class="en-font" style="font-size: 1.2rem; color: #888; display: block; font-weight: normal;">DETAILS</span></h2>
 
+            <!-- Vertical V-Card -->
             <div class="v-card">
                 <div class="v-card-item">
-                    <div class="v-card-label en-font">DATE</div>
-                    <div class="v-card-val">2026 年 12 月 25 日（五）</div>
+                    <div class="v-card-label">新人姓名</div>
+                    <div class="v-card-value"><span class="no-wrap">歐洸熏 OSCAR</span> & <span class="no-wrap">曾照恩 ANN</span></div>
                 </div>
                 <div class="v-card-item">
-                    <div class="v-card-label en-font">TIME</div>
-                    <div class="v-card-val">12:00 PM 宴席開始 (11:30 AM 入席)</div>
+                    <div class="v-card-label">婚禮日期</div>
+                    <div class="v-card-value"><span class="no-wrap">民國 116 年 1 月 9 日</span> (星期六)</div>
                 </div>
                 <div class="v-card-item">
-                    <div class="v-card-label en-font">LOCATION</div>
-                    <div class="v-card-val"><span class="no-wrap">美代子奢華婚宴會館</span> 3樓 薔薇廳</div>
+                    <div class="v-card-label">流程時間</div>
+                    <div class="v-card-value">
+                        午宴入席：11:30<br>
+                        午宴開席：12:30
+                    </div>
                 </div>
                 <div class="v-card-item">
-                    <div class="v-card-label en-font">ADDRESS</div>
-                    <div class="v-card-val"><span class="no-wrap">台北市信義區松高路 88 號</span></div>
+                    <div class="v-card-label">婚禮地點</div>
+                    <div class="v-card-value"><span class="no-wrap">臺中市北屯區芳庭路1號</span></div>
+                </div>
+                <div class="v-card-item">
+                    <div class="v-card-label">着裝建議 Dress Code</div>
+                    <div class="v-card-value">白色、奶茶色、大地色系</div>
+                    <div class="color-dots">
+                        <span class="dot" style="background-color: #ffffff;"></span>
+                        <span class="dot" style="background-color: #d7c4b7;"></span>
+                        <span class="dot" style="background-color: #a38f78;"></span>
+                    </div>
                 </div>
             </div>
 
-            <!-- 交通指引 (Accordion 摺疊面板) -->
-            <div style="margin-bottom: 4rem;">
-                <h3 style="text-align: center; margin-bottom: 1.5rem; color: var(--text-dark); font-weight: 400;">交通指引 <span class="en-font">LOCATION GUIDE</span></h3>
-
+            <!-- Accordion Traffic Guide -->
+            <div class="accordion">
                 <div class="accordion-item">
-                    <button class="accordion-header" type="button">
-                        <span>捷運資訊</span>
-                        <span>+</span>
+                    <button class="accordion-header" onclick="toggleAccordion(this)">
+                        <span>🚗 駕車指引 & 停車資訊</span>
+                        <span>▼</span>
                     </button>
                     <div class="accordion-content">
-                        <p>搭乘捷運板南線至 <span class="no-wrap">市政府站</span> 3 號出口，步行約 5 分鐘即可抵達 <span class="no-wrap">美代子奢華婚宴會館</span>。</p>
+                        <p>國道1號下<span class="no-wrap">「中清交流道」</span>往市區方向 → <span class="no-wrap">「文心路左轉」</span> → <span class="no-wrap">「北屯路右轉」</span> → <span class="no-wrap">「太原路左轉」</span>直行到底 → <span class="no-wrap">「北坑巷崗亭右轉」</span>即可抵達<span class="no-wrap">「芳庭路1號」</span>。場地備有專屬停車場供賓客停放。</p>
                     </div>
                 </div>
-
                 <div class="accordion-item">
-                    <button class="accordion-header" type="button">
-                        <span>公車資訊</span>
-                        <span>+</span>
+                    <button class="accordion-header" onclick="toggleAccordion(this)">
+                        <span>🚇 大眾運輸 / 計程車接駁</span>
+                        <span>▼</span>
                     </button>
                     <div class="accordion-content">
-                        <p>搭乘公車 284、202、611 至 <span class="no-wrap">松高路口站</span> 下車，即可看見會館標示。</p>
+                        <p>搭乘台鐵至<span class="no-wrap">「太原火車站」</span>或高鐵至<span class="no-wrap">「臺中高鐵站」</span>後，建議轉乘計程車/叫車服務直達<span class="no-wrap">「臺中市北屯區芳庭路1號」</span>（車程約 15-20 分鐘）。因位於山區，建議返程提早預約叫車。</p>
                     </div>
                 </div>
+            </div>
 
-                <div class="accordion-item">
-                    <button class="accordion-header" type="button">
-                        <span>停車資訊</span>
-                        <span>+</span>
-                    </button>
-                    <div class="accordion-content">
-                        <p>會館地下 2 樓至 4 樓設有專屬地下停車場，賓客可憑婚宴邀請函享免費停車 3 小時。</p>
-                    </div>
-                </div>
+            <!-- Embedded Map Section -->
+            <div class="map-wrapper">
+                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3640.168758814713!2d120.76492007604627!3d24.162315978391295!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x346917e76166e4a1%3A0xb3551bd5d666dc!2zNDA3NzDZhOa4heW4guWMl-WxrumAruiLsXHot6_ls7kx6Jmf!5e0!3m2!1szh-TW!2stw!4v1700000000000!5m2!1szh-TW!2stw" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+            </div>
+            <div style="text-align: center;">
+                <a href="https://maps.google.com/?q=臺中市北屯區芳庭路1號" target="_blank" class="map-btn">📍 開啟 Google 地圖導航</a>
             </div>
         </section>
 
-        <!-- 出席回函 (RSVP Form) -->
+        <!-- RSVP Form Section -->
         <section id="rsvp">
-            <h2 class="section-title">RSVP</h2>
-            <p class="section-subtitle">出席回函表單</p>
+            <h2 class="section-title">出席回函 <span class="en-font" style="font-size: 1.2rem; color: #888; display: block; font-weight: normal;">RSVP</span></h2>
 
-            <div style="background: #fff; padding: 2.5rem 2rem; border-radius: 16px; box-shadow: var(--card-shadow);">
-                <!-- 隱藏式 Iframe 提交技術 -->
-                <iframe name="hidden_iframe" id="hidden_iframe" onload="if(submitted) {alert('感謝您的回覆！我們期待在婚禮上與您見面。'); form.reset(); checkAttendance();}"></iframe>
-                
-                <form id="weddingForm" action="https://docs.google.com/forms/d/e/1FAIpQLSfJVYvJE2t3JWjzprufLrtnPokcRj51VEIrsZyhGVab3kDYbw/formResponse" method="POST" target="hidden_iframe" onsubmit="submitted=true;">
-                    
-                    <!-- 姓名 (NAME) -->
-                    <div class="form-group">
-                        <label for="entry_1087091649">姓名 <span class="en-label">NAME</span></label>
-                        <input type="text" id="entry_1087091649" name="entry.1087091649" required value="">
-                    </div>
+            <form class="rsvp-form" action="https://docs.google.com/forms/d/e/1FAIpQLSfJVYvJE2t3JWjzprufLrtnPokcRj51VEIrsZyhGVab3kDYbw/formResponse" method="POST" target="hidden_iframe" onsubmit="submitted=true;">
 
-                    <!-- 賓客關係 (RELATIONSHIP) -->
-                    <div class="form-group">
-                        <label for="entry_1542348020">賓客關係 <span class="en-label">RELATIONSHIP</span></label>
-                        <select id="entry_1542348020" name="entry.1542348020" required>
-                            <option value="" disabled selected>請選擇賓客關係</option>
-                            <option value="男方好友">男方好友</option>
-                            <option value="女方好友">女方好友</option>
-                            <option value="男方親戚">男方親戚</option>
-                            <option value="女方親戚">女方親戚</option>
-                        </select>
-                    </div>
+                <div class="form-group">
+                    <label>姓名 <span class="en-label">NAME</span></label>
+                    <input type="text" name="entry.1087091649" class="form-control" required placeholder="">
+                </div>
 
-                    <!-- 參加午宴人數 (ATTENDANCE) -->
-                    <div class="form-group">
-                        <label for="entry_855339064">參加午宴人數 <span class="en-label">ATTENDANCE</span></label>
-                        <input type="number" id="entry_855339064" name="entry.855339064" min="0" placeholder="若無法出席請填 0" required value="" oninput="checkAttendance()">
-                    </div>
+                <div class="form-group">
+                    <label>與新人關係 <span class="en-label">RELATIONSHIP</span></label>
+                    <select name="entry.1542348020" class="form-control" required>
+                        <option value="" disabled selected>請選擇關係</option>
+                        <option value="男方好友">男方好友</option>
+                        <option value="女方好友">女方好友</option>
+                        <option value="男方親戚">男方親戚</option>
+                        <option value="女方親戚">女方親戚</option>
+                    </select>
+                </div>
 
-                    <!-- 飲食需求 (DIET) - 動態顯示 -->
-                    <div class="form-group dynamic-field" id="dietField">
-                        <label for="entry_1396592569">飲食需求 <span class="en-label">DIETARY REQUIREMENTS</span></label>
-                        <select id="entry_1396592569" name="entry.1396592569">
-                            <option value="葷">葷</option>
-                            <option value="素">素</option>
-                        </select>
-                    </div>
+                <div class="form-group">
+                    <label>參加午宴人數 <span class="en-label">ATTENDEES</span></label>
+                    <input type="number" id="attendeesCount" name="entry.855339064" class="form-control" min="0" max="10" required onchange="handleAttendeeChange(this.value)">
+                </div>
 
-                    <!-- 是否需要兒童椅 (BABY CHAIR) - 動態顯示 -->
-                    <div class="form-group dynamic-field" id="chairField">
-                        <label for="entry_373461124">是否需要兒童椅 <span class="en-label">BABY CHAIR</span></label>
-                        <select id="entry_373461124" name="entry.373461124">
-                            <option value="需要">需要</option>
-                            <option value="不需要">不需要</option>
-                        </select>
-                    </div>
+                <div class="form-group conditional-field" id="dietField">
+                    <label>飲食需求 <span class="en-label">DIET</span></label>
+                    <select name="entry.1396592569" class="form-control">
+                        <option value="葷">葷</option>
+                        <option value="素">素</option>
+                    </select>
+                </div>
 
-                    <!-- 寄送喜帖地址 (ADDRESS) -->
-                    <div class="form-group">
-                        <label for="entry_848875810">寄送喜帖地址 <span class="en-label">MAILING ADDRESS</span></label>
-                        <input type="text" id="entry_848875810" name="entry.848875810" required value="">
-                    </div>
+                <div class="form-group conditional-field" id="chairField">
+                    <label>是否需要兒童椅 <span class="en-label">HIGH CHAIR</span></label>
+                    <select name="entry.373461124" class="form-control">
+                        <option value="不需要">不需要</option>
+                        <option value="需要">需要</option>
+                    </select>
+                </div>
 
-                    <button type="submit" class="submit-btn">確認送出 <span class="en-font">SUBMIT</span></button>
-                </form>
-            </div>
+                <div class="form-group">
+                    <label>祝福的話 <span class="en-label">BLESSING</span></label>
+                    <textarea name="entry.848875810" class="form-control" rows="4"></textarea>
+                </div>
+
+                <button type="submit" class="btn-submit">確認送出</button>
+            </form>
         </section>
     </div>
 
     <script>
         var submitted = false;
+        const audio = document.getElementById('bgm');
+        const overlay = document.getElementById('entranceOverlay');
 
-        // 倒數計時邏輯 (預設目標日期：2026/12/25)
-        const targetDate = new Date("December 25, 2026 12:00:00").getTime();
+        function enterInvitation() {
+            audio.muted = false;
+            audio.currentTime = 0;
+            audio.play().catch(function(e) {
+                console.log('音樂播放失敗：', e);
+            });
+            overlay.classList.add('hidden');
+        }
+
+        overlay.setAttribute('tabindex', '0');
+        overlay.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' || e.key === ' ') {
+                enterInvitation();
+            }
+        });
+
+        function toggleAudio() {
+            if (audio.paused || audio.muted) {
+                audio.muted = false;
+                audio.play().catch(e => console.log(e));
+            } else {
+                audio.pause();
+            }
+        }
+
+        // Countdown Timer
+        const targetDate = new Date('2027-01-09T11:30:00').getTime();
 
         function updateCountdown() {
             const now = new Date().getTime();
@@ -502,49 +644,36 @@
                 const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
                 const seconds = Math.floor((difference % (1000 * 60)) / 1000);
 
-                document.getElementById("days").innerText = days < 10 ? '0' + days : days;
-                document.getElementById("hours").innerText = hours < 10 ? '0' + hours : hours;
-                document.getElementById("minutes").innerText = minutes < 10 ? '0' + minutes : minutes;
-                document.getElementById("seconds").innerText = seconds < 10 ? '0' + seconds : seconds;
+                document.getElementById('days').innerText = String(days).padStart(2, '0');
+                document.getElementById('hours').innerText = String(hours).padStart(2, '0');
+                document.getElementById('minutes').innerText = String(minutes).padStart(2, '0');
+                document.getElementById('seconds').innerText = String(seconds).padStart(2, '0');
+            } else {
+                document.getElementById('countdown').innerHTML = "<div style='font-size: 1.5rem; color: #ffffff;'>婚禮進行中！</div>";
             }
         }
+
         setInterval(updateCountdown, 1000);
         updateCountdown();
 
-        // 摺疊面板 Accordion 互動
-        const accHeaders = document.querySelectorAll(".accordion-header");
-        accHeaders.forEach(header => {
-            header.addEventListener("click", function() {
-                const content = this.nextElementSibling;
-                const isOpen = content.style.maxHeight;
+        // Accordion Toggle Logic
+        function toggleAccordion(button) {
+            const content = button.nextElementSibling;
+            content.classList.toggle('active');
+        }
 
-                // 關閉其他展開項目
-                document.querySelectorAll(".accordion-content").forEach(item => {
-                    item.style.maxHeight = null;
-                });
-                document.querySelectorAll(".accordion-header span:last-child").forEach(icon => {
-                    icon.innerText = "+";
-                });
+        // Smart Form Logic
+        function handleAttendeeChange(val) {
+            const count = parseInt(val, 10);
+            const dietField = document.getElementById('dietField');
+            const chairField = document.getElementById('chairField');
 
-                if (!isOpen) {
-                    content.style.maxHeight = content.scrollHeight + "px";
-                    this.querySelector("span:last-child").innerText = "-";
-                }
-            });
-        });
-
-        // 智能表單邏輯：人數大於 0 時才顯示飲食需求與兒童椅
-        function checkAttendance() {
-            const countInput = document.getElementById("entry_855339064").value;
-            const dietField = document.getElementById("dietField");
-            const chairField = document.getElementById("chairField");
-
-            if (countInput !== "" && parseInt(countInput, 10) > 0) {
-                dietField.style.display = "block";
-                chairField.style.display = "block";
+            if (!isNaN(count) && count > 0) {
+                dietField.style.display = 'block';
+                chairField.style.display = 'block';
             } else {
-                dietField.style.display = "none";
-                chairField.style.display = "none";
+                dietField.style.display = 'none';
+                chairField.style.display = 'none';
             }
         }
     </script>

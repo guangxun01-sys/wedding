@@ -432,9 +432,9 @@
     <!-- Hidden Iframe for Form Submission -->
     <iframe name="hidden_iframe" id="hidden_iframe" style="display:none;" onload="if(submitted){alert('出席回函已順利送出，期待您的到來！');}"></iframe>
 
-    <!-- Background Music -->
+    <!-- Background Music (local file, purchased) -->
     <audio id="bgm" loop playsinline preload="auto">
-        <source src="canon-in-d-piano.mp3" type="audio/mpeg">
+        <source src="beautiful-in-white.m4a" type="audio/mp4">
     </audio>
 
     <button class="audio-btn" id="audioToggle" onclick="toggleAudio()" title="播放/暫停音樂">🎵</button>
@@ -576,19 +576,25 @@
                 </div>
 
                 <div class="form-group conditional-field" id="dietField">
-                    <label>飲食需求 <span class="en-label">DIET</span></label>
-                    <select name="entry.1396592569" class="form-control">
-                        <option value="葷">葷</option>
-                        <option value="素">素</option>
-                    </select>
+                    <label>飲食需求（葷食／素食人數） <span class="en-label">DIET</span></label>
+                    <div style="display:flex; gap:0.8rem;">
+                        <div style="flex:1;">
+                            <label style="font-size:0.85rem; font-weight:normal; color:#666;">葷食人數</label>
+                            <input type="number" id="meatCount" class="form-control" min="0" max="10" value="0" oninput="validateDietCount()">
+                        </div>
+                        <div style="flex:1;">
+                            <label style="font-size:0.85rem; font-weight:normal; color:#666;">素食人數</label>
+                            <input type="number" id="vegCount" class="form-control" min="0" max="10" value="0" oninput="validateDietCount()">
+                        </div>
+                    </div>
+                    <div id="dietWarning" style="display:none; color:#c0392b; font-size:0.85rem; margin-top:0.4rem;">葷食＋素食人數需等於參加午宴人數</div>
+                    <input type="hidden" name="entry.1396592569" id="dietHiddenInput">
                 </div>
 
                 <div class="form-group conditional-field" id="chairField">
-                    <label>是否需要兒童椅 <span class="en-label">HIGH CHAIR</span></label>
-                    <select name="entry.373461124" class="form-control">
-                        <option value="不需要">不需要</option>
-                        <option value="需要">需要</option>
-                    </select>
+                    <label>需要兒童椅數量 <span class="en-label">HIGH CHAIR</span></label>
+                    <input type="number" id="chairCount" class="form-control" min="0" max="10" value="0">
+                    <input type="hidden" name="entry.373461124" id="chairHiddenInput">
                 </div>
 
                 <div class="form-group">
@@ -667,15 +673,56 @@
             const count = parseInt(val, 10);
             const dietField = document.getElementById('dietField');
             const chairField = document.getElementById('chairField');
+            const meatInput = document.getElementById('meatCount');
+            const vegInput = document.getElementById('vegCount');
+            const chairInput = document.getElementById('chairCount');
 
             if (!isNaN(count) && count > 0) {
                 dietField.style.display = 'block';
                 chairField.style.display = 'block';
+                meatInput.max = count;
+                vegInput.max = count;
+                chairInput.max = count;
+                // 預設全部帶入葷食人數，讓使用者自行調整
+                meatInput.value = count;
+                vegInput.value = 0;
             } else {
                 dietField.style.display = 'none';
                 chairField.style.display = 'none';
             }
+            validateDietCount();
         }
+
+        function validateDietCount() {
+            const attendees = parseInt(document.getElementById('attendeesCount').value, 10) || 0;
+            const meat = parseInt(document.getElementById('meatCount').value, 10) || 0;
+            const veg = parseInt(document.getElementById('vegCount').value, 10) || 0;
+            const warning = document.getElementById('dietWarning');
+            const isValid = (meat + veg) === attendees;
+            warning.style.display = isValid ? 'none' : 'block';
+            return isValid;
+        }
+
+        // 送出前，把葷食/素食人數與兒童椅數量組合寫入實際送往 Google 表單的隱藏欄位
+        document.querySelector('.rsvp-form').addEventListener('submit', function(e) {
+            const attendees = parseInt(document.getElementById('attendeesCount').value, 10) || 0;
+
+            if (attendees > 0 && !validateDietCount()) {
+                e.preventDefault();
+                submitted = false;
+                alert('葷食人數＋素食人數需等於參加午宴人數，請確認後再送出。');
+                return false;
+            }
+
+            const meat = document.getElementById('meatCount').value || 0;
+            const veg = document.getElementById('vegCount').value || 0;
+            const chair = document.getElementById('chairCount').value || 0;
+
+            document.getElementById('dietHiddenInput').value = attendees > 0 ? ('葷食 ' + meat + ' 人、素食 ' + veg + ' 人') : '';
+            document.getElementById('chairHiddenInput').value = attendees > 0 ? ('兒童椅 ' + chair + ' 張') : '';
+
+            submitted = true;
+        });
     </script>
 </body>
 </html>

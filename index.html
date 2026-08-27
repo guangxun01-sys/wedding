@@ -551,7 +551,6 @@
         <section id="rsvp">
             <h2 class="section-title">出席回函 <span class="en-font" style="font-size: 1.2rem; color: #888; display: block; font-weight: normal;">RSVP</span></h2>
 
-            <!-- 指向你的 Google 表單 formResponse 網址 -->
             <form id="rsvpForm" class="rsvp-form" action="https://docs.google.com/forms/d/e/1FAIpQLSfJVYvJE2t3JWjzprufLrtnPokcRj51VEIrsZyhGVab3kDYbw/formResponse" method="POST" target="hidden_iframe">
 
                 <div class="form-group">
@@ -588,15 +587,14 @@
                         </div>
                     </div>
                     <div id="dietWarning" style="display:none; color:#c0392b; font-size:0.85rem; margin-top:0.4rem;">葷食＋素食人數需等於參加午宴人數</div>
-                    <!-- 寫入 Google 表單的隱藏欄位 -->
+                    <!-- 傳送至 Google 表單的飲食需求 (entry.1396592569) -->
                     <input type="hidden" name="entry.1396592569" id="dietHiddenInput">
                 </div>
 
                 <div class="form-group conditional-field" id="chairField">
                     <label>需要兒童椅數量 <span class="en-label">HIGH CHAIR</span></label>
-                    <input type="number" id="chairCount" class="form-control" min="0" max="10" value="0">
-                    <!-- 寫入 Google 表單的隱藏欄位 -->
-                    <input type="hidden" name="entry.373461124" id="chairHiddenInput">
+                    <!-- 傳送至 Google 表單的兒童椅數量 (entry.373461124) -->
+                    <input type="number" id="chairCount" name="entry.373461124" class="form-control" min="0" max="10" value="0">
                 </div>
 
                 <div class="form-group">
@@ -690,6 +688,9 @@
             } else {
                 dietField.style.display = 'none';
                 chairField.style.display = 'none';
+                meatInput.value = 0;
+                vegInput.value = 0;
+                chairInput.value = 0;
             }
             validateDietCount();
         }
@@ -704,7 +705,7 @@
             return isValid;
         }
 
-        // 表單提交處理
+        // 表單提交處理：格式化輸出方便統計
         document.getElementById('rsvpForm').addEventListener('submit', function(e) {
             const attendees = parseInt(document.getElementById('attendeesCount').value, 10) || 0;
 
@@ -717,11 +718,13 @@
 
             const meat = document.getElementById('meatCount').value || 0;
             const veg = document.getElementById('vegCount').value || 0;
-            const chair = document.getElementById('chairCount').value || 0;
 
-            // 將使用者選擇的資訊轉為文字，寫入對應的隱藏欄位
-            document.getElementById('dietHiddenInput').value = attendees > 0 ? ('葷食 ' + meat + ' 人、素食 ' + veg + ' 人') : '不參加';
-            document.getElementById('chairHiddenInput').value = attendees > 0 ? ('兒童椅 ' + chair + ' 張') : '不需要';
+            // 輸出至 entry.1396592569（格式例如：葷2素1，便於試算表篩選與計算）
+            if (attendees > 0) {
+                document.getElementById('dietHiddenInput').value = '葷' + meat + '素' + veg;
+            } else {
+                document.getElementById('dietHiddenInput').value = '0';
+            }
 
             submitted = true;
         });

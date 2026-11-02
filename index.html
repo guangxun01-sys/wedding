@@ -429,6 +429,9 @@
         <div class="enter-btn">💍 點擊進入 ENTER</div>
     </div>
 
+    <!-- Hidden Iframe for Form Submission -->
+    <iframe name="hidden_iframe" id="hidden_iframe" style="display:none;" onload="if(submitted){alert('出席回函已順利送出，期待您的到來！');}"></iframe>
+
     <!-- Background Music (local file, purchased) -->
     <audio id="bgm" loop playsinline preload="auto">
         <source src="beautiful-in-white.m4a" type="audio/mp4">
@@ -549,7 +552,7 @@
         <section id="rsvp">
             <h2 class="section-title">出席回函 <span class="en-font" style="font-size: 1.2rem; color: #888; display: block; font-weight: normal;">RSVP</span></h2>
 
-            <form class="rsvp-form" id="rsvpForm">
+            <form class="rsvp-form" action="https://docs.google.com/forms/d/e/1FAIpQLSfJVYvJE2t3JWjzprufLrtnPokcRj51VEIrsZyhGVab3kDYbw/formResponse" method="POST" target="hidden_iframe">
 
                 <div class="form-group">
                     <label>姓名 <span class="en-label">NAME</span></label>
@@ -599,12 +602,15 @@
                     <textarea name="entry.848875810" class="form-control" rows="4"></textarea>
                 </div>
 
-                <button type="submit" class="btn-submit" id="submitBtn">確認送出</button>
+                <input type="hidden" name="fvv" value="1">
+                <input type="hidden" name="pageHistory" value="0">
+                <button type="submit" id="submitBtn" class="btn-submit">確認送出</button>
             </form>
         </section>
     </div>
 
     <script>
+        var submitted = false;
         const audio = document.getElementById('bgm');
         const overlay = document.getElementById('entranceOverlay');
 
@@ -679,6 +685,7 @@
                 meatInput.max = count;
                 vegInput.max = count;
                 chairInput.max = count;
+                // 預設全部帶入葷食人數，讓使用者自行調整
                 meatInput.value = count;
                 vegInput.value = 0;
             } else {
@@ -698,54 +705,45 @@
             return isValid;
         }
 
-        // 使用 fetch API 透過 no-cors 模式直接發送至 Google 表單 (解決 iframe 跨網域封鎖問題)
-        document.getElementById('rsvpForm').addEventListener('submit', function(e) {
+        // 送出：組合欄位後，以 fetch 直接送到 Google 表單
+        document.querySelector('.rsvp-form').addEventListener('submit', function(e) {
             e.preventDefault();
-
+            const form = e.target;
+            const btn = document.getElementById('submitBtn');
             const attendees = parseInt(document.getElementById('attendeesCount').value, 10) || 0;
 
             if (attendees > 0 && !validateDietCount()) {
                 alert('葷食人數＋素食人數需等於參加午宴人數，請確認後再送出。');
-                return;
+                return false;
             }
 
             const meat = document.getElementById('meatCount').value || 0;
             const veg = document.getElementById('vegCount').value || 0;
             const chair = document.getElementById('chairCount').value || 0;
 
-            document.getElementById('dietHiddenInput').value = attendees > 0 ? ('葷食 ' + meat + ' 人、素食 ' + veg + ' 人') : '';
-            document.getElementById('chairHiddenInput').value = attendees > 0 ? ('兒童椅 ' + chair + ' 張') : '';
+            // 一律填入非空白文字，避免表單設為必填時被拒收
+            document.getElementById('dietHiddenInput').value = attendees > 0 ? ('葷食 ' + meat + ' 人、素食 ' + veg + ' 人') : '不出席';
+            document.getElementById('chairHiddenInput').value = attendees > 0 ? ('兒童椅 ' + chair + ' 張') : '兒童椅 0 張';
 
-            const submitBtn = document.getElementById('submitBtn');
-            submitBtn.disabled = true;
-            submitBtn.innerText = '傳送中...';
+            const body = new URLSearchParams(new FormData(form));
+            btn.disabled = true;
+            const oldText = btn.textContent;
+            btn.textContent = '送出中…';
 
-            const formData = new URLSearchParams();
-            formData.append('entry.1087091649', document.querySelector('[name="entry.1087091649"]').value);
-            formData.append('entry.1542348020', document.querySelector('[name="entry.1542348020"]').value);
-            formData.append('entry.855339064', document.querySelector('[name="entry.855339064"]').value);
-            formData.append('entry.1396592569', document.getElementById('dietHiddenInput').value);
-            formData.append('entry.373461124', document.getElementById('chairHiddenInput').value);
-            formData.append('entry.848875810', document.querySelector('[name="entry.848875810"]').value);
-
-            const formActionUrl = 'https://docs.google.com/forms/d/e/1FAIpQLSfJVYvJE2t3JWjzprufLrtnPokcRj51VEIrsZyhGVab3kDYbw/formResponse';
-
-            fetch(formActionUrl, {
+            fetch(form.action, {
                 method: 'POST',
                 mode: 'no-cors',
-                body: formData
-            }).then(() => {
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: body.toString()
+            }).then(function() {
                 alert('出席回函已順利送出，期待您的到來！');
-                document.getElementById('rsvpForm').reset();
-                document.getElementById('dietField').style.display = 'none';
-                document.getElementById('chairField').style.display = 'none';
-                submitBtn.disabled = false;
-                submitBtn.innerText = '確認送出';
-            }).catch(error => {
-                console.error('送出失敗：', error);
-                alert('送出時發生網路異常，請稍後再試或直接聯繫新人。');
-                submitBtn.disabled = false;
-                submitBtn.innerText = '確認送出';
+                form.reset();
+                handleAttendeeChange('');
+            }).catch(function() {
+                alert('送出失敗，請檢查網路連線後再試一次。');
+            }).finally(function() {
+                btn.disabled = false;
+                btn.textContent = oldText;
             });
         });
     </script>

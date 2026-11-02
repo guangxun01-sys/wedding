@@ -429,10 +429,7 @@
         <div class="enter-btn">💍 點擊進入 ENTER</div>
     </div>
 
-    <!-- Hidden Iframe for Form Submission -->
-    <iframe name="hidden_iframe" id="hidden_iframe" style="display:none;" onload="if(submitted){alert('出席回函已順利送出，期待您的到來！');}"></iframe>
-
-    <!-- Background Music -->
+    <!-- Background Music (local file, purchased) -->
     <audio id="bgm" loop playsinline preload="auto">
         <source src="beautiful-in-white.m4a" type="audio/mp4">
     </audio>
@@ -485,6 +482,7 @@
         <section id="details">
             <h2 class="section-title">婚禮詳情 <span class="en-font" style="font-size: 1.2rem; color: #888; display: block; font-weight: normal;">DETAILS</span></h2>
 
+            <!-- Vertical V-Card -->
             <div class="v-card">
                 <div class="v-card-item">
                     <div class="v-card-label">新人姓名</div>
@@ -551,11 +549,11 @@
         <section id="rsvp">
             <h2 class="section-title">出席回函 <span class="en-font" style="font-size: 1.2rem; color: #888; display: block; font-weight: normal;">RSVP</span></h2>
 
-            <form id="rsvpForm" class="rsvp-form" action="https://docs.google.com/forms/d/e/1FAIpQLSfJVYvJE2t3JWjzprufLrtnPokcRj51VEIrsZyhGVab3kDYbw/formResponse" method="POST" target="hidden_iframe">
+            <form class="rsvp-form" id="rsvpForm">
 
                 <div class="form-group">
                     <label>姓名 <span class="en-label">NAME</span></label>
-                    <input type="text" name="entry.1087091649" class="form-control" required placeholder="請輸入姓名">
+                    <input type="text" name="entry.1087091649" class="form-control" required placeholder="">
                 </div>
 
                 <div class="form-group">
@@ -587,14 +585,13 @@
                         </div>
                     </div>
                     <div id="dietWarning" style="display:none; color:#c0392b; font-size:0.85rem; margin-top:0.4rem;">葷食＋素食人數需等於參加午宴人數</div>
-                    <!-- 傳送至 Google 表單的飲食需求 (entry.1396592569) -->
                     <input type="hidden" name="entry.1396592569" id="dietHiddenInput">
                 </div>
 
                 <div class="form-group conditional-field" id="chairField">
                     <label>需要兒童椅數量 <span class="en-label">HIGH CHAIR</span></label>
-                    <!-- 傳送至 Google 表單的兒童椅數量 (entry.373461124) -->
-                    <input type="number" id="chairCount" name="entry.373461124" class="form-control" min="0" max="10" value="0">
+                    <input type="number" id="chairCount" class="form-control" min="0" max="10" value="0">
+                    <input type="hidden" name="entry.373461124" id="chairHiddenInput">
                 </div>
 
                 <div class="form-group">
@@ -602,13 +599,12 @@
                     <textarea name="entry.848875810" class="form-control" rows="4"></textarea>
                 </div>
 
-                <button type="submit" class="btn-submit">確認送出</button>
+                <button type="submit" class="btn-submit" id="submitBtn">確認送出</button>
             </form>
         </section>
     </div>
 
     <script>
-        var submitted = false;
         const audio = document.getElementById('bgm');
         const overlay = document.getElementById('entranceOverlay');
 
@@ -688,9 +684,6 @@
             } else {
                 dietField.style.display = 'none';
                 chairField.style.display = 'none';
-                meatInput.value = 0;
-                vegInput.value = 0;
-                chairInput.value = 0;
             }
             validateDietCount();
         }
@@ -705,28 +698,55 @@
             return isValid;
         }
 
-        // 表單提交處理：格式化輸出方便統計
+        // 使用 fetch API 透過 no-cors 模式直接發送至 Google 表單 (解決 iframe 跨網域封鎖問題)
         document.getElementById('rsvpForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
             const attendees = parseInt(document.getElementById('attendeesCount').value, 10) || 0;
 
             if (attendees > 0 && !validateDietCount()) {
-                e.preventDefault();
-                submitted = false;
                 alert('葷食人數＋素食人數需等於參加午宴人數，請確認後再送出。');
-                return false;
+                return;
             }
 
             const meat = document.getElementById('meatCount').value || 0;
             const veg = document.getElementById('vegCount').value || 0;
+            const chair = document.getElementById('chairCount').value || 0;
 
-            // 輸出至 entry.1396592569（格式例如：葷2素1，便於試算表篩選與計算）
-            if (attendees > 0) {
-                document.getElementById('dietHiddenInput').value = '葷' + meat + '素' + veg;
-            } else {
-                document.getElementById('dietHiddenInput').value = '0';
-            }
+            document.getElementById('dietHiddenInput').value = attendees > 0 ? ('葷食 ' + meat + ' 人、素食 ' + veg + ' 人') : '';
+            document.getElementById('chairHiddenInput').value = attendees > 0 ? ('兒童椅 ' + chair + ' 張') : '';
 
-            submitted = true;
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = true;
+            submitBtn.innerText = '傳送中...';
+
+            const formData = new URLSearchParams();
+            formData.append('entry.1087091649', document.querySelector('[name="entry.1087091649"]').value);
+            formData.append('entry.1542348020', document.querySelector('[name="entry.1542348020"]').value);
+            formData.append('entry.855339064', document.querySelector('[name="entry.855339064"]').value);
+            formData.append('entry.1396592569', document.getElementById('dietHiddenInput').value);
+            formData.append('entry.373461124', document.getElementById('chairHiddenInput').value);
+            formData.append('entry.848875810', document.querySelector('[name="entry.848875810"]').value);
+
+            const formActionUrl = 'https://docs.google.com/forms/d/e/1FAIpQLSfJVYvJE2t3JWjzprufLrtnPokcRj51VEIrsZyhGVab3kDYbw/formResponse';
+
+            fetch(formActionUrl, {
+                method: 'POST',
+                mode: 'no-cors',
+                body: formData
+            }).then(() => {
+                alert('出席回函已順利送出，期待您的到來！');
+                document.getElementById('rsvpForm').reset();
+                document.getElementById('dietField').style.display = 'none';
+                document.getElementById('chairField').style.display = 'none';
+                submitBtn.disabled = false;
+                submitBtn.innerText = '確認送出';
+            }).catch(error => {
+                console.error('送出失敗：', error);
+                alert('送出時發生網路異常，請稍後再試或直接聯繫新人。');
+                submitBtn.disabled = false;
+                submitBtn.innerText = '確認送出';
+            });
         });
     </script>
 </body>

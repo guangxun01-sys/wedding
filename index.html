@@ -722,8 +722,16 @@
             const chair = document.getElementById('chairCount').value || 0;
 
             // 一律填入非空白文字，避免表單設為必填時被拒收
-            document.getElementById('dietHiddenInput').value = attendees > 0 ? ('葷食 ' + meat + ' 人、素食 ' + veg + ' 人') : '不出席';
-            document.getElementById('chairHiddenInput').value = attendees > 0 ? ('兒童椅 ' + chair + ' 張') : '兒童椅 0 張';
+            // 純葷／純素只送「葷食」「素食」（相容選擇題）；混合才送人數說明
+            var dietText = '不出席';
+            if (attendees > 0) {
+                if (parseInt(veg, 10) === 0) dietText = '葷食';
+                else if (parseInt(meat, 10) === 0) dietText = '素食';
+                else dietText = '葷食 ' + meat + ' 人、素食 ' + veg + ' 人';
+            }
+            document.getElementById('dietHiddenInput').value = dietText;
+            // 兒童椅題為數字題，只送純數字
+            document.getElementById('chairHiddenInput').value = attendees > 0 ? String(parseInt(chair, 10) || 0) : '0';
 
             const body = new URLSearchParams(new FormData(form));
             btn.disabled = true;

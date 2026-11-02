@@ -432,7 +432,7 @@
     <!-- Hidden Iframe for Form Submission -->
     <iframe name="hidden_iframe" id="hidden_iframe" style="display:none;" onload="if(submitted){alert('出席回函已順利送出，期待您的到來！');}"></iframe>
 
-    <!-- Background Music (local file, purchased) -->
+    <!-- Background Music -->
     <audio id="bgm" loop playsinline preload="auto">
         <source src="beautiful-in-white.m4a" type="audio/mp4">
     </audio>
@@ -685,7 +685,6 @@
                 meatInput.max = count;
                 vegInput.max = count;
                 chairInput.max = count;
-                // 預設全部帶入葷食人數，讓使用者自行調整
                 meatInput.value = count;
                 vegInput.value = 0;
             } else {
@@ -705,7 +704,7 @@
             return isValid;
         }
 
-        // 送出：組合欄位後，以 fetch 直接送到 Google 表單
+        // 送出：修正中文編碼與下拉選單的字串格式
         document.querySelector('.rsvp-form').addEventListener('submit', function(e) {
             e.preventDefault();
             const form = e.target;
@@ -721,8 +720,6 @@
             const veg = document.getElementById('vegCount').value || 0;
             const chair = document.getElementById('chairCount').value || 0;
 
-            // 一律填入非空白文字，避免表單設為必填時被拒收
-            // 純葷／純素只送「葷食」「素食」（相容選擇題）；混合才送人數說明
             var dietText = '不出席';
             if (attendees > 0) {
                 if (parseInt(veg, 10) === 0) dietText = '葷食';
@@ -730,10 +727,15 @@
                 else dietText = '葷食 ' + meat + ' 人、素食 ' + veg + ' 人';
             }
             document.getElementById('dietHiddenInput').value = dietText;
-            // 兒童椅題為數字題，只送純數字
             document.getElementById('chairHiddenInput').value = attendees > 0 ? String(parseInt(chair, 10) || 0) : '0';
 
-            const body = new URLSearchParams(new FormData(form));
+            // 【關鍵修正】強制使用 URLSearchParams 進行 UTF-8 URL 編碼，確保中文姓名與所有下拉選項（如女方好友、親戚等）能正確送達 Google 表單
+            const formData = new FormData(form);
+            const bodyParams = new URLSearchParams();
+            for (const [key, value] of formData.entries()) {
+                bodyParams.append(key, value);
+            }
+
             btn.disabled = true;
             const oldText = btn.textContent;
             btn.textContent = '送出中…';
@@ -741,8 +743,8 @@
             fetch(form.action, {
                 method: 'POST',
                 mode: 'no-cors',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: body.toString()
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
+                body: bodyParams.toString()
             }).then(function() {
                 alert('出席回函已順利送出，期待您的到來！');
                 form.reset();

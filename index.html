@@ -429,8 +429,8 @@
         <div class="enter-btn">💍 點擊進入 ENTER</div>
     </div>
 
-    <!-- Hidden Iframe for Form Submission -->
-    <iframe name="hidden_iframe" id="hidden_iframe" style="display:none;" onload="if(submitted){alert('出席回函已順利送出，期待您的到來！');}"></iframe>
+    <!-- Hidden Iframe for Form Submission (原生表單的絕佳拍檔) -->
+    <iframe name="hidden_iframe" id="hidden_iframe" style="display:none;" onload="if(isSubmitted){ alert('出席回函已順利送出，期待您的到來！'); document.getElementById('rsvpForm').reset(); handleAttendeeChange(''); isSubmitted=false; document.getElementById('submitBtn').disabled=false; document.getElementById('submitBtn').textContent='確認送出'; }"></iframe>
 
     <!-- Background Music -->
     <audio id="bgm" loop playsinline preload="auto">
@@ -552,7 +552,8 @@
         <section id="rsvp">
             <h2 class="section-title">出席回函 <span class="en-font" style="font-size: 1.2rem; color: #888; display: block; font-weight: normal;">RSVP</span></h2>
 
-            <form class="rsvp-form" action="https://docs.google.com/forms/d/e/1FAIpQLSfJVYvJE2t3JWjzprufLrtnPokcRj51VEIrsZyhGVab3kDYbw/formResponse" method="POST" target="hidden_iframe">
+            <!-- 使用傳統 target="hidden_iframe" 確保 100% 成功送出與編碼正確 -->
+            <form id="rsvpForm" class="rsvp-form" action="https://docs.google.com/forms/d/e/1FAIpQLSfJVYvJE2t3JWjzprufLrtnPokcRj51VEIrsZyhGVab3kDYbw/formResponse" method="POST" target="hidden_iframe" onsubmit="return handleFormSubmit(event)">
 
                 <div class="form-group">
                     <label>姓名 <span class="en-label">NAME</span></label>
@@ -610,7 +611,7 @@
     </div>
 
     <script>
-        var submitted = false;
+        var isSubmitted = false;
         const audio = document.getElementById('bgm');
         const overlay = document.getElementById('entranceOverlay');
 
@@ -704,11 +705,8 @@
             return isValid;
         }
 
-        // 送出：修正中文編碼與下拉選單的字串格式
-        document.querySelector('.rsvp-form').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const form = e.target;
-            const btn = document.getElementById('submitBtn');
+        // 傳統原生表單送出前處理
+        function handleFormSubmit(event) {
             const attendees = parseInt(document.getElementById('attendeesCount').value, 10) || 0;
 
             if (attendees > 0 && !validateDietCount()) {
@@ -729,33 +727,13 @@
             document.getElementById('dietHiddenInput').value = dietText;
             document.getElementById('chairHiddenInput').value = attendees > 0 ? String(parseInt(chair, 10) || 0) : '0';
 
-            // 【關鍵修正】強制使用 URLSearchParams 進行 UTF-8 URL 編碼，確保中文姓名與所有下拉選項（如女方好友、親戚等）能正確送達 Google 表單
-            const formData = new FormData(form);
-            const bodyParams = new URLSearchParams();
-            for (const [key, value] of formData.entries()) {
-                bodyParams.append(key, value);
-            }
-
+            isSubmitted = true;
+            const btn = document.getElementById('submitBtn');
             btn.disabled = true;
-            const oldText = btn.textContent;
             btn.textContent = '送出中…';
 
-            fetch(form.action, {
-                method: 'POST',
-                mode: 'no-cors',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
-                body: bodyParams.toString()
-            }).then(function() {
-                alert('出席回函已順利送出，期待您的到來！');
-                form.reset();
-                handleAttendeeChange('');
-            }).catch(function() {
-                alert('送出失敗，請檢查網路連線後再試一次。');
-            }).finally(function() {
-                btn.disabled = false;
-                btn.textContent = oldText;
-            });
-        });
+            return true; // 允許表單順利送出到 hidden_iframe
+        }
     </script>
 </body>
 </html>
